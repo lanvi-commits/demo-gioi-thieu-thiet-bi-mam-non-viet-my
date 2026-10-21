@@ -1,6 +1,6 @@
 # Demo hiệu ứng: trang Giới thiệu Thiết bị mầm non Việt Mỹ
 
-Bản chụp nguyên trang https://website-demo-02.thcmedia.vn/gioi-thieu/ (ngày 21/10/2026). **Không đổi nội dung hay thứ tự section nào.** Demo phủ thêm 6 hiệu ứng, thu gọn khoảng cách giữa các section, chỉnh cỡ chữ theo tab "Size chữ", làm gọn hero và thêm hiệu ứng cho 3 khối Tầm nhìn & Sứ mệnh, Hành trình phát triển, Giá trị cốt lõi.
+Bản chụp nguyên trang https://website-demo-02.thcmedia.vn/gioi-thieu/ (ngày 21/10/2026). **Không đổi nội dung hay thứ tự section nào.** Demo phủ thêm 6 hiệu ứng, thu gọn khoảng cách giữa các section, chỉnh cỡ chữ theo tab "Size chữ", làm gọn hero, thêm hiệu ứng cho 3 khối Tầm nhìn & Sứ mệnh, Hành trình phát triển, Giá trị cốt lõi, và cho Quy trình tư vấn hiện/ẩn theo chiều cuộn.
 
 **Xem demo:** https://lanvi-commits.github.io/demo-gioi-thieu-thiet-bi-mam-non-viet-my/
 
@@ -27,13 +27,15 @@ Trên điện thoại, hiệu ứng hover tự tắt. Máy bật "giảm chuyể
 |---|---|---|
 | Tầm nhìn & Sứ mệnh | 2 thẻ hiện dần và trượt lên 16px, thẻ sau trễ 0,1 giây | Icon nhún lên 4px |
 | Hành trình phát triển, máy tính (≥ 992px) | Thanh đỏ tự vẽ từ trái sang trong 1 giây. Mốc nào được thanh chạm tới thì bật ra, chữ dưới mốc trượt lên theo. Mốc cuối ("Hiện tại") toả 2 vòng sóng rồi dừng | Icon nhún lên 4px |
-| Hành trình phát triển, tablet/mobile (≤ 991px) | Site ẩn thanh đỏ ở khổ này, nên từng mốc hiện dần khi cuộn tới | – |
+| Hành trình phát triển, tablet (768–991px) | Site ẩn thanh đỏ ở khổ này, nên từng mốc hiện dần khi cuộn tới | – |
+| Hành trình phát triển, mobile (≤ 767px) | Mốc xếp dọc, icon nằm bên trái. **Thanh đỏ dọc dài ra khi cuộn xuống, ngắn lại khi cuộn lên**: thanh chạm tới mốc nào thì mốc đó vừa lên tới 60% chiều cao màn hình. Từng mốc hiện dần khi cuộn tới | – |
 | Giá trị cốt lõi | 5 thẻ hiện dần và trượt lên 16px, các thẻ cùng hàng lệch nhau 0,08 giây | **Cả thẻ nhún lên 4px** kèm bóng nhẹ, viền chuyển đỏ nhạt (bóng và viền lấy đúng hover thẻ Đối tác), icon nhún thêm 4px |
 
 - Tiêu đề H2 của 3 khối giữ nguyên, không có hiệu ứng, giống các section khác.
 - Tầm nhìn và Hành trình không nhấc cả thẻ khi rê chuột, vì các thẻ này không bấm được, nhấc lên kèm bóng dễ khiến khách tưởng là link. Riêng Giá trị cốt lõi nhấc cả thẻ theo yêu cầu.
 - Thẻ Giá trị cốt lõi dùng thuộc tính `translate` cho hiệu ứng hiện dần và `transform` cho nhún khi hover. Hai thuộc tính độc lập nên thẻ nhún ngay khi rê chuột. Nếu dùng chung `transform`, thẻ phải chờ hết nhịp trễ của hiệu ứng hiện dần (tới 0,32 giây) và nhún chậm 0,6 giây.
-- Máy bật "giảm chuyển động": thẻ chỉ hiện dần (0,3 giây), không trượt, không vẽ thanh, không có sóng, icon không nhún.
+- Máy bật "giảm chuyển động": thẻ chỉ hiện dần (0,3 giây), không trượt, không vẽ thanh, không có sóng, icon không nhún. Thanh dọc trên mobile hiện đủ ngay, không chạy theo cuộn.
+- **Đổi bố cục Hành trình trên mobile (≤ 767px):** site hiện xếp mốc thành cột, chữ căn giữa ngay dưới icon, nên một thanh dọc chạy giữa sẽ đè lên chữ. Vì vậy demo đổi sang kiểu trục trái, giống khối Quy trình cùng trang: icon nằm trái, chữ căn trái bên phải, thanh chạy qua tâm các icon. Tablet (768–991px) giữ bố cục lưới 2 cột như site.
 - Nội dung chỉ bị ẩn khi JS đã chạy. Nếu JS lỗi, cả 3 khối vẫn hiện bình thường như site hiện tại. Thẻ được ẩn bằng `opacity`, nên Google và trình đọc màn hình vẫn đọc đủ chữ.
 
 **Cho DEV:**
@@ -43,6 +45,19 @@ Trên điện thoại, hiệu ứng hover tự tắt. Máy bật "giảm chuyể
 - **Bẫy 2:** theme có 2 `@keyframes` cùng tên `fadeInUp` (`style-animations.css` trượt 40px; `style-header.css` kèm `translateX(-50%)`). Bản khai sau thắng, nên đừng dùng lại tên này cho hiệu ứng hiện dần.
 
 **Lỗi có sẵn trên site (demo chưa sửa):** từ 991px trở xuống, 2 thẻ Tầm nhìn/Sứ mệnh chỉ cao 50px và **toàn bộ chữ trong thẻ bị cắt mất**, chỉ còn thấy icon (đo cả trên site thật ở 820px và 390px). Nguyên nhân: ở khổ này theme đổi `.cards` sang cột, nhưng `.card` vẫn giữ `flex: 1 1 0` cùng `overflow: hidden`. Kích thước tối thiểu của thẻ vì thế về 0, và thẻ co lại chỉ còn phần đệm. Cách sửa: thêm `.about_vision_mission .card { flex: 0 0 auto }` trong `@media (max-width: 991.98px)`.
+
+## Quy trình tư vấn: hiện khi cuộn xuống, ẩn khi cuộn lên
+
+Áp cho cả desktop và mobile. Ở site hiện tại, khối này đứng yên.
+
+- Cuộn xuống: từng bước (số thứ tự, đoạn nối và thẻ) hiện dần và trượt lên 16px khi lọt vào màn hình. Các bước cùng lọt vào một lúc lệch nhau 0,08 giây.
+- Cuộn lên: bước nào trôi xuống dưới mép kích hoạt (10% cuối màn hình) thì ẩn dần, đi ngược đúng đường lúc hiện. Bước trôi ra phía trên màn hình thì giữ nguyên, không ẩn.
+- Thời gian hiện 0,6 giây, ẩn 0,4 giây. Máy bật "giảm chuyển động" thì chỉ hiện và mờ dần, không trượt.
+- Accordion mở/đóng giữ như site, không đụng tới.
+
+**Cho DEV:** CSS ở mục 13 trong khối `<style id="vmx-fx">`. JS dùng chung file `vmx-fx-cuon` với 3 khối trên; nhóm Quy trình được khai `both: true`, nghĩa là không bỏ theo dõi sau lần hiện đầu. Thanh dọc Hành trình mobile nằm ở mục 11b (CSS) và cuối file JS (biến `--vmx-rail-p` đi từ 0 tới 1).
+
+**Bẫy đo vị trí (thanh dọc mobile):** các mốc đang ẩn có `transform`, nên Chrome lấy chính `.item` làm `offsetParent` của icon. Nếu tính bằng `list.offsetTop + marker.offsetTop` thì mọi icon đo ra 0 và thanh dài 0px. Cách đúng là cộng dồn `offsetTop` ngược lên tới `.timeline`. Không dùng `getBoundingClientRect` vì kết quả lệch theo đoạn trượt 16px.
 
 ## Khoảng cách giữa các section (sheet dòng 114)
 
