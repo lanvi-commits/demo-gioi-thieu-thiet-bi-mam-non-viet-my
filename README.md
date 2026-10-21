@@ -1,10 +1,10 @@
 # Demo hiệu ứng: trang Giới thiệu Thiết bị mầm non Việt Mỹ
 
-Bản chụp nguyên trang https://website-demo-02.thcmedia.vn/gioi-thieu/ (ngày 21/10/2026). **Không đổi nội dung, cỡ chữ hay thứ tự section nào.** Demo phủ thêm 6 hiệu ứng và thu gọn khoảng cách giữa các section.
+Bản chụp nguyên trang https://website-demo-02.thcmedia.vn/gioi-thieu/ (ngày 21/10/2026). **Không đổi nội dung, cỡ chữ hay thứ tự section nào.** Demo phủ thêm 6 hiệu ứng, thu gọn khoảng cách giữa các section và chỉnh cỡ chữ theo tab "Size chữ".
 
 **Xem demo:** https://lanvi-commits.github.io/demo-gioi-thieu-thiet-bi-mam-non-viet-my/
 
-Công tắc ở góc dưới trái dùng để bật/tắt bản đề xuất (hiệu ứng + khoảng cách) và so trực tiếp với live. Link có `?fx=0` mở thẳng chế độ Tắt (giống site hiện tại).
+Công tắc ở góc dưới trái dùng để bật/tắt bản đề xuất (hiệu ứng, khoảng cách, cỡ chữ) và so trực tiếp với live. Link có `?fx=0` mở thẳng chế độ Tắt (giống site hiện tại).
 
 ## 6 hiệu ứng thêm (theo tab "Review tổng thể website")
 
@@ -40,6 +40,23 @@ Bảng dưới là khoảng nhìn thấy, đo từ mép nội dung (chữ, ảnh
 Các chỗ nội dung sát dải màu đỏ/cam (Thành tựu, Dự án, Tư vấn viên) vốn đã ≤ 56px nên giữ nguyên, chỉ thu ở tablet/mobile nếu vượt 44/36px.
 
 **Bẫy cho DEV:** ảnh hero cần được cắt khi zoom. Không dùng `overflow: hidden` cho `.media`, mà dùng `overflow: clip`. Lý do: ở khổ ≤ 991px, `.media` là phần tử co giãn; `hidden` làm kích thước tối thiểu của nó về 0, khung co lại 0px và mất ảnh hero (bản demo đầu tiên đã dính lỗi này ở tablet/mobile).
+
+## Cỡ chữ (theo tab "Size chữ" của sheet Brief)
+
+Khối `<style id="vmx-co-chu">`. Thang chữ desktop gồm 12 · 14 · 16 · 18 · 20 · 28 · 36, mobile (≤ 767px) gồm 12 · 14 · 16 · 24 · 28. Chỉ sửa những chữ đang lệch bảng, các chữ đã đúng thì giữ nguyên:
+
+| Phần tử | Site hiện tại (desktop / mobile) | Theo bảng |
+|---|---|---|
+| H1 hero | 48 / 32 | H1 36 / 28 |
+| Mô tả dưới H2 (9 section) | 18 / 14–18 | Chữ phụ 14 / 14 |
+| Tên card: Tầm nhìn, Giá trị cốt lõi, Đội ngũ, Tại sao chọn, Quy trình | 24 / 18–20, đậm 600 | Tiêu đề nhỏ 18 / 16, đậm 700 |
+| Mô tả trong card, mốc Hành trình, accordion, bước Quy trình | 16 / 14 | Chữ phụ 14 / 14 |
+| Con số Thành tựu | 44 / 36, đậm 800 | H2 28 / 24, đậm 700 |
+| Nhãn số liệu, chức vụ Đội ngũ | 18 / 16 | Chữ phụ 14 / 14 |
+| Năm Hành trình ("2013") | 24 / 24, đậm 600 | H3 20 / 16, đậm 700 |
+| Tab "Reviews", nút Zalo/QR mobile, breadcrumb | 13–16 / 12–13 | Chữ phụ 14 / 14 |
+
+Độ đậm của Đoạn văn, Chữ phụ và Chữ nhỏ giữ như site, theo ghi chú trong bảng ("đang ok thì khỏi đổi").
 
 ## Ghi chú cho DEV
 

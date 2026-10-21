@@ -641,6 +641,73 @@ html.vmx-fx #about_activity_gallery { padding-top: 0; padding-bottom: min(48px, 
   .vmx-toggle__thumb, .vmx-toggle__track { transition: none; }
 }
 </style>
+<style id="vmx-co-chu">
+/* =====================================================================
+   8 · CỠ CHỮ TRANG GIỚI THIỆU — theo bảng của user: sheet Brief, tab "Size chữ" (gid 2060241940), đọc 21/10/2026.
+   Desktop ≥768: 12 · 14 · 16 · 18 · 20 · 28 · 36   ·   Mobile ≤767: 12 · 14 · 16 · 24 · 28
+   Đậm: H1 → Tiêu đề nhỏ = 700. Đoạn văn / Chữ phụ / Chữ nhỏ: GIỮ độ đậm của site (user ghi "đang ok thì khỏi đổi").
+   KHÁC token trong ghi chú DEV trang chủ 20/10 (H3 22/20, H4 20/18) → file này theo BẢNG (H3 20/16, H4 18/16),
+   không dùng de-xuat-co-chu.css của trang chủ.
+   Chỉ khai các chữ đang LỆCH bảng — đo live 21/10 ở 1440/390; chữ đã đúng (header, menu, H2, tên dự án,
+   tên nhóm, tên người, lời đánh giá, footer) để nguyên.
+   ===================================================================== */
+html.vmx-fx {
+  --fs-h1: 36px;     /* H1                                          | mobile 28 */
+  --fs-h2: 28px;     /* H2 tiêu đề section + con số thống kê        | mobile 24 */
+  --fs-h3: 20px;     /* H3: tên dự án, tên bài viết                 | mobile 16 */
+  --fs-title: 18px;  /* H4 + Tiêu đề nhỏ: tên nhóm, tên card, tên người | mobile 16 */
+  --fs-body: 16px;   /* Đoạn văn: đoạn giới thiệu, lời đánh giá, nút lớn */
+  --fs-sm: 14px;     /* Chữ phụ: mô tả dưới H2, chức vụ, mô tả card, nhãn số liệu, nút nhỏ, tab */
+  --fs-xs: 12px;     /* Chữ nhỏ: topbar, badge, tag, ngày */
+  --lh-heading: 1.25; --lh-title: 1.4; --lh-body: 1.6; --lh-small: 1.5;
+}
+@media (max-width: 767px) {
+  html.vmx-fx { --fs-h1: 28px; --fs-h2: 24px; --fs-h3: 16px; --fs-title: 16px; }
+}
+
+/* H1 — hero: live 48 / 32 */
+html.vmx-fx #about_hero_story h1.title-thc { font-size: var(--fs-h1); line-height: var(--lh-heading); font-weight: 700; }
+
+/* H2 — con số Thành tựu ("500+"): live 44 / 36, đậm 800 → bảng: "con số thống kê" theo H2, đậm 700 */
+html.vmx-fx #about_achievements .value { font-size: var(--fs-h2); line-height: 1.2; font-weight: 700; }
+
+/* H3 — năm trong Hành trình ("2013"): live 24 / 24, đậm 600. Ghi chú DEV 16/10 xếp vào H3 → theo dòng H3 của bảng */
+html.vmx-fx #about_journey .year { font-size: var(--fs-h3); line-height: 1.3; font-weight: 700; }
+
+/* Tiêu đề nhỏ — tên card + tên người: live 24 / 18–20, đậm 600 */
+html.vmx-fx #about_vision_mission .card-title,
+html.vmx-fx #about_core_values .card-title,
+html.vmx-fx #about_team .card-title,
+html.vmx-fx #about_why_choose .item-title,
+html.vmx-fx #about_process .item-title { font-size: var(--fs-title); line-height: var(--lh-title); font-weight: 700; }
+
+/* Chữ phụ — mô tả ngay dưới H2: live 18 desktop, mobile lẫn 14 / 16 / 18 */
+html.vmx-fx section[id] :is(.heading, .header) > :is(p.subtitle, .desc),
+html.vmx-fx #about_journey .heading .subtitle   /* theme khai riêng bằng ID: #about_journey .subtitle 18 / 16 */
+  { font-size: var(--fs-sm); line-height: var(--lh-body); }
+
+/* Chữ phụ — mô tả trong card / mốc / bước: live 16 / 14 */
+html.vmx-fx #about_vision_mission .card-desc,
+html.vmx-fx #about_core_values .card-desc,
+html.vmx-fx #about_journey .copy .desc,
+html.vmx-fx #about_why_choose .item-desc,
+html.vmx-fx #about_process .item-desc { font-size: var(--fs-sm); line-height: var(--lh-small); }
+
+/* Chữ phụ — nhãn số liệu ("Dự án lớn"): live 18 / 16 · chức vụ + kinh nghiệm Đội ngũ: live 18 / 16, mobile 13 */
+html.vmx-fx #about_achievements .meta .label,
+html.vmx-fx #about_team .card-role,
+html.vmx-fx #about_team .card-exp, html.vmx-fx #about_team .card-exp *,
+html.vmx-fx #about_team .info-more .card-desc { font-size: var(--fs-sm); line-height: var(--lh-small); }
+
+/* Chữ phụ — nút nhỏ + tab: tab "Reviews / Hình ảnh" 13 · nút Zalo / QR Tư vấn viên mobile 13 */
+html.vmx-fx #customer_testimonials button.tab,
+html.vmx-fx #consultant_team .btn span { font-size: var(--fs-sm); }
+
+/* Chữ phụ — breadcrumb: live 16 / 12 (bảng không ghi riêng; xếp cùng nhóm chữ phụ như ghi chú DEV 16/10) */
+/* theme mobile ép 12 bằng .breadcrumb-wrapper .rank-math-breadcrumb a / .last → khai cùng tầng; icon phân cách <i> giữ nguyên */
+html.vmx-fx .breadcrumb-wrapper .rank-math-breadcrumb,
+html.vmx-fx .breadcrumb-wrapper .rank-math-breadcrumb :is(a, span, p) { font-size: var(--fs-sm); line-height: var(--lh-small); }
+</style>
 </head>
 
 <body class="wp-singular page-template page-template-templates page-template-module-flexible-content page-template-templatesmodule-flexible-content-php page page-id-284 wp-theme-thcmedia-atlas theme-thcmedia-atlas woocommerce-no-js">
@@ -5305,9 +5372,9 @@ var e="script#wp-emoji-settings",t=document.querySelector(e);if(!(t instanceof H
   btn.type = 'button';
   btn.className = 'vmx-toggle';
   btn.setAttribute('role', 'switch');
-  btn.setAttribute('aria-label', 'Bản đề xuất: hiệu ứng và khoảng cách section');   // trạng thái Bật/Tắt đọc qua aria-checked
+  btn.setAttribute('aria-label', 'Bản đề xuất: hiệu ứng, khoảng cách section, cỡ chữ');   // trạng thái Bật/Tắt đọc qua aria-checked
   btn.innerHTML = '<span class="vmx-toggle__track" aria-hidden="true"><span class="vmx-toggle__thumb"></span></span>' +
-                  '<span>Đề xuất<span class="vmx-toggle__long"> (hiệu ứng + khoảng cách)</span>: <span class="vmx-toggle__state"></span></span>';
+                  '<span>Đề xuất<span class="vmx-toggle__long"> (hiệu ứng, khoảng cách, cỡ chữ)</span>: <span class="vmx-toggle__state"></span></span>';
   var state = btn.querySelector('.vmx-toggle__state');
 
   function render() {
