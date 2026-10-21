@@ -709,7 +709,8 @@ html.vmx-fx #about_journey .marker::after {
     animation: vmx-journey-ripple 1200ms var(--ease-out) calc(var(--vmx-at, 0ms) + 400ms) 2;
   }
 }
-@media (max-width: 991.98px) {
+/* 768–991 (lưới 2 cột): từng mốc hiện 1 lần. ≤767 chạy theo cuộn cùng thanh dọc — xem 11b (v8). */
+@media (min-width: 768px) and (max-width: 991.98px) {
   html.vmx-fx #about_journey .item {
     transition: opacity 600ms var(--ease-out) var(--vmx-delay, 0ms), transform 600ms var(--ease-out) var(--vmx-delay, 0ms);
   }
@@ -741,6 +742,17 @@ html.vmx-fx #about_journey .marker::after {
     transform-origin: 50% 0;
     transform: scaleY(var(--vmx-rail-p, 0));
   }
+  /* v8 (user: "các ô sẽ hiện dần… cùng với thanh đỏ"): ô mốc rõ dần ngay trước khi đầu thanh chạm icon, chạm là đủ;
+     cuộn lên thanh rút qua thì mờ lại. --vmx-p do JS đặt mỗi khung cuộn — KHÔNG transition, không thì ô trễ sau thanh.
+     Chưa có --vmx-p (JS lỗi) → 1 = hiện như thường. */
+  html.vmx-fx #about_journey .item {
+    opacity: var(--vmx-p, 1);
+    translate: 0 calc((1 - var(--vmx-p, 1)) * 16px);
+  }
+  /* thanh chạy tới mốc cuối → mốc "Hiện tại" toả 2 vòng sóng (mỗi lần thanh chạy hết lại diễn lại) */
+  html.vmx-fx #about_journey .timeline.vmx-rail-full .item:last-child .marker::after {
+    animation: vmx-journey-ripple 1200ms var(--ease-out) 2;
+  }
 }
 
 /* Giảm chuyển động: chỉ còn mờ → rõ (300ms), không trượt, không vẽ thanh, không sóng, icon không nhún */
@@ -764,26 +776,27 @@ html.vmx-fx #about_journey .marker::after {
 }
 
 /* ---------------------------------------------------------------------
-   13 · QUY TRÌNH TƯ VẤN — HIỆN DẦN KHI CUỘN XUỐNG, ẨN DẦN KHI CUỘN LÊN (v7, user 21/10, desktop + mobile).
-   Mỗi bước (số + đoạn nối + thẻ) mờ → rõ + trượt lên 16px khi lọt màn hình; cuộn lên làm bước trôi xuống dưới mép
-   kích hoạt (10% đáy) thì ẩn ngược lại theo đúng đường vào. Trôi ra phía TRÊN màn hình thì giữ nguyên.
-   Hiện 600ms, ẩn 400ms (transition lấy theo trạng thái ĐÍCH: rule :not(.is-in) quyết thời lượng ẩn).
+   13 · QUY TRÌNH TƯ VẤN — HIỆN DẦN KHI CUỘN XUỐNG, ẨN DẦN KHI CUỘN LÊN (user 21/10, desktop + mobile).
+   v8: CHẠY THEO VỊ TRÍ CUỘN. Mỗi bước (số + đoạn nối + thẻ) mờ ↔ rõ + trượt 24px theo --vmx-p (JS đặt mỗi khung cuộn):
+   mép trên bước ở đáy màn hình = 0, lên tới 75% chiều cao màn hình = 1. Cuộn lên thì lùi lại ngay trong dải 25% đáy
+   màn hình — thấy được. (v7 gỡ is-in khi bước trôi xuống 10% đáy → mờ lúc đã sắp khuất, user "chưa thấy hiệu ứng".)
+   Không transition: giá trị đi theo tay cuộn, có transition sẽ trễ.
    Dùng `translate` thay vì `transform` để không đụng transform nào của theme / accordion.
    Live: đứng yên, accordion mở/đóng bằng `hidden` (không trượt) — giữ nguyên, không đụng.
    --------------------------------------------------------------------- */
 html.vmx-fx #about_process .item {
-  transition: opacity 600ms var(--ease-out) var(--vmx-delay, 0ms), translate 600ms var(--ease-out) var(--vmx-delay, 0ms);
-}
-html.vmx-fx.vmx-reveal #about_process .item:not(.is-in) {
-  opacity: 0; translate: 0 16px;
-  transition-duration: 400ms; transition-delay: 0ms;
+  opacity: var(--vmx-p, 1);
+  translate: 0 calc((1 - var(--vmx-p, 1)) * 24px);
 }
 
-/* Giảm chuyển động (v7): thanh dọc Hành trình mobile hiện đủ, không chạy theo cuộn · Quy trình chỉ mờ ↔ rõ */
+/* Giảm chuyển động: thanh dọc Hành trình mobile hiện đủ, không chạy theo cuộn, không sóng · ô mốc mobile + Quy trình
+   chỉ mờ ↔ rõ theo cuộn, không trượt */
 @media (prefers-reduced-motion: reduce) {
   html.vmx-fx #about_journey .timeline::after { transform: none; }
-  html.vmx-fx #about_process .item { transition: opacity 300ms ease; }
-  html.vmx-fx.vmx-reveal #about_process .item:not(.is-in) { translate: none; transition-duration: 300ms; }
+  html.vmx-fx #about_process .item { translate: none; }
+}
+@media (prefers-reduced-motion: reduce) and (max-width: 767.98px) {
+  html.vmx-fx #about_journey .item { translate: none; transition: none; }
 }
 
 /* =====================================================================
@@ -5550,15 +5563,19 @@ var e="script#wp-emoji-settings",t=document.querySelector(e);if(!(t instanceof H
      - JS lỗi / chưa tải xong → cũng không có html.vmx-reveal → không bao giờ kẹt nội dung ở trạng thái ẩn.
      - Ẩn bằng opacity, không display/visibility → máy đọc màn hình và Google vẫn đọc đủ chữ.
 
-   2 kiểu hiện:
-     1 lần       Tầm nhìn, Hành trình, Giá trị cốt lõi — hiện rồi thôi, cuộn ngược lên không diễn lại
-     2 chiều     Quy trình (user 21/10: "hiện dần khi cuộn xuống và ẩn dần khi cuộn lên") — phần tử trôi xuống
-                 dưới mép kích hoạt (tức đang cuộn lên) thì gỡ is-in → ẩn dần; trôi ra phía TRÊN màn hình thì giữ nguyên
+   2 kiểu:
+     hiện 1 lần        Tầm nhìn, Hành trình, Giá trị cốt lõi — lọt màn hình thì gắn is-in, CSS chạy transition, cuộn
+                       ngược lên không diễn lại
+     theo vị trí cuộn  Quy trình + thanh dọc Hành trình ≤767 (user 21/10: "hiện dần khi cuộn xuống và ẩn dần khi cuộn
+                       lên") — mỗi khung cuộn tính tiến độ 0…1 theo vị trí trên màn hình → CSS vẽ theo biến. Dừng cuộn ở
+                       đâu thì đứng ở đó, cuộn lên thì lùi lại NGAY trong vùng nhìn thấy.
+                       (v7 dùng kiểu "gỡ is-in khi trôi xuống 10% đáy" → bước mờ đi lúc đã sắp ra khỏi màn hình, user
+                       báo "cuộn lên chưa thấy hiệu ứng" → v8 đổi sang kiểu này.)
 
    Hành trình có 3 kiểu, CSS tự chọn theo khổ:
      ≥992px     cả dải mốc là 1 khối (.timeline): thanh ngang vẽ từ trái sang, mốc bật ra khi thanh chạm tới
      768–991px  theme ẩn thanh, mốc xếp lưới 2 cột → từng mốc (.item) hiện khi cuộn tới
-     ≤767px     mốc xếp dọc, icon bên trái: thanh dọc dài ra khi cuộn xuống, ngắn lại khi cuộn lên (--vmx-rail-p 0→1)
+     ≤767px     mốc xếp dọc, icon bên trái: thanh dọc + các ô mốc chạy theo cuộn (--vmx-rail-p, --vmx-p trên .item)
    → quan sát cả .timeline lẫn từng .item; CSS mỗi khổ chỉ dùng phần của khổ đó. */
 (function () {
   'use strict';
@@ -5568,8 +5585,7 @@ var e="script#wp-emoji-settings",t=document.querySelector(e);if(!(t instanceof H
   var GROUPS = [
     { sel: '#about_vision_mission .card', step: 100 },
     { sel: '#about_journey .item', step: 100 },
-    { sel: '#about_core_values .card', step: 80 },
-    { sel: '#about_process .item', step: 80, both: true }
+    { sel: '#about_core_values .card', step: 80 }
   ];
   var UNITS = ['#about_journey .timeline'];          // khối hiện 1 lần, nhịp lệch nằm sẵn trong CSS
 
@@ -5611,25 +5627,19 @@ var e="script#wp-emoji-settings",t=document.querySelector(e);if(!(t instanceof H
   }
 
   function reveal(entries, io) {
-    var show = [];
-    entries.forEach(function (e) {
-      var cfg = cfgOf.get(e.target);
-      if (e.isIntersecting) show.push(e.target);
-      else if (cfg && cfg.both && e.rootBounds && e.boundingClientRect.top >= e.rootBounds.bottom) {
-        e.target.style.setProperty('--vmx-delay', '0ms');   // ẩn không lệch nhịp — phần tử nào trôi xuống thì ẩn ngay cái đó
-        e.target.classList.remove('is-in');
-      }
-    });
-    show.sort(function (a, b) {                        // lệch nhịp theo đúng thứ tự đọc
-      return a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1;
-    });
+    var show = entries
+      .filter(function (e) { return e.isIntersecting; })
+      .map(function (e) { return e.target; })
+      .sort(function (a, b) {                          // lệch nhịp theo đúng thứ tự đọc
+        return a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1;
+      });
     var k = 0;
     show.forEach(function (el) {
       var cfg = cfgOf.get(el);
       if (cfg) el.style.setProperty('--vmx-delay', (k++ * cfg.step) + 'ms');
       if (el.classList.contains('timeline')) syncTimeline(el);
       el.classList.add('is-in');
-      if (!cfg || !cfg.both) io.unobserve(el);         // kiểu 1 lần: thôi theo dõi
+      io.unobserve(el);                                // chạy 1 lần, cuộn ngược lên không diễn lại
     });
   }
 
@@ -5640,47 +5650,81 @@ var e="script#wp-emoji-settings",t=document.querySelector(e);if(!(t instanceof H
   var ioUnit = new IntersectionObserver(reveal, { rootMargin: '0px 0px -25% 0px', threshold: 0.5 });
   targets.forEach(function (el) { (cfgOf.has(el) ? ioCard : ioUnit).observe(el); });
 
-  /* ≤767 · Thanh dọc Hành trình chạy theo cuộn (user 21/10: "hiện dần khi cuộn xuống và ẩn dần khi cuộn lên").
-     Thanh nối tâm icon mốc đầu → tâm icon mốc cuối (--vmx-rail-top / --vmx-rail-h, đo lại khi khung đổi cỡ).
-     Tiến độ = phần thanh đã lên quá đường đọc (60% chiều cao màn hình) → --vmx-rail-p 0…1, CSS vẽ bằng scaleY.
-     Đo bằng offsetTop (không tính transform) vì mốc đang trượt 16px lúc hiện dần → getBoundingClientRect sẽ lệch. */
-  var tl = document.querySelector('#about_journey .timeline');
-  var list = tl && tl.querySelector('.list');
-  var markers = tl ? tl.querySelectorAll('.marker') : [];
-  var mobile = window.matchMedia('(max-width: 767.98px)');
-  var READ_LINE = 0.6;
-  if (!tl || !list || markers.length < 2) return;
-
-  var top = 0, len = 0, queued = false;
-  // Cộng offsetTop ngược lên tới .timeline. Đừng lấy list.offsetTop + marker.offsetTop: mốc đang ẩn có transform
-  // → Chrome lấy chính .item làm offsetParent của icon → mọi icon đo ra 0, thanh dài 0px (gặp thật 21/10).
-  function centerY(m) {
-    var y = m.offsetHeight / 2;
-    for (var el = m; el && el !== tl; el = el.offsetParent) y += el.offsetTop;
+  /* THEO VỊ TRÍ CUỘN — 1 vòng requestAnimationFrame cho cả 2 phần dưới, đo lại khi bố cục đổi (ảnh tải, mở accordion…).
+     Đo bằng offsetTop (không tính transform) vì phần tử đang trượt → getBoundingClientRect lệch theo chính độ trượt.
+     Cộng dồn offsetTop ngược lên. Đừng lấy list.offsetTop + marker.offsetTop: mốc đang ẩn có transform → Chrome lấy
+     chính .item làm offsetParent của icon → mọi icon đo ra 0, thanh dài 0px (gặp thật 21/10). */
+  function offsetY(el, stop) {
+    var y = 0;
+    for (; el && el !== stop; el = el.offsetParent) y += el.offsetTop;
     return y;
   }
+  function clamp01(v) { return Math.min(1, Math.max(0, v)); }
+
+  // a) ≤767 · Hành trình: thanh dọc + các ô mốc đi CÙNG NHAU (user 21/10: "các ô sẽ hiện dần khi cuộn xuống và ẩn dần
+  //    khi cuộn lên cùng với thanh đỏ, không phải chỉ có thanh đỏ").
+  //    Thanh nối tâm icon mốc đầu → tâm icon mốc cuối (--vmx-rail-top / --vmx-rail-h). Đầu thanh = đường đọc 60% chiều
+  //    cao màn hình → --vmx-rail-p 0…1, CSS vẽ bằng scaleY.
+  //    Ô mốc rõ dần trong 15% màn hình ngay trước khi đầu thanh chạm icon, chạm là hiện đủ (--vmx-p trên .item);
+  //    cuộn lên, thanh rút qua icon nào thì ô đó mờ dần theo. Thanh chạy hết → .vmx-rail-full (mốc cuối toả sóng).
+  var tl = document.querySelector('#about_journey .timeline');
+  var markers = tl ? [].slice.call(tl.querySelectorAll('.marker')) : [];
+  var mItems = markers.map(function (m) { return m.closest('.item'); });
+  var hasRail = !!tl && markers.length > 1;
+  var mobile = window.matchMedia('(max-width: 767.98px)');
+  var READ_LINE = 0.6, ITEM_BAND = 0.15;
+  var railTop = 0, railLen = 0, centers = [];
+
+  // b) Quy trình (desktop + mobile): mép trên mỗi bước ở ĐÁY màn hình → 0 (ẩn), lên tới 75% chiều cao màn hình → 1
+  //    (hiện đủ) → --vmx-p trên từng bước, CSS vẽ mờ ↔ rõ + trượt 24px. Cuộn lên thì lùi lại trong dải 25% đáy màn hình.
+  var steps = [].slice.call(document.querySelectorAll('#about_process .item'));
+  var STEP_FROM = 1, STEP_TO = 0.75;
+  var stepTops = [];
+  if (!hasRail && !steps.length) return;
+
   function measure() {
-    if (!mobile.matches) return;
-    top = centerY(markers[0]);
-    len = Math.max(0, centerY(markers[markers.length - 1]) - top);
-    tl.style.setProperty('--vmx-rail-top', top + 'px');
-    tl.style.setProperty('--vmx-rail-h', len + 'px');
-    progress();
+    if (hasRail && mobile.matches) {
+      centers = markers.map(function (m) { return offsetY(m, tl) + m.offsetHeight / 2; });   // tâm icon, tính từ đỉnh .timeline
+      railTop = centers[0];
+      railLen = Math.max(0, centers[centers.length - 1] - railTop);
+      tl.style.setProperty('--vmx-rail-top', railTop + 'px');
+      tl.style.setProperty('--vmx-rail-h', railLen + 'px');
+    }
+    stepTops = steps.map(function (el) { return offsetY(el, null); });   // toạ độ tính từ đầu trang
+    update();
   }
-  function progress() {
+
+  var queued = false;
+  function update() {
     queued = false;
-    if (!mobile.matches || !len) return;
-    var start = tl.getBoundingClientRect().top + top;
-    var p = Math.min(1, Math.max(0, (window.innerHeight * READ_LINE - start) / len));
-    tl.style.setProperty('--vmx-rail-p', p.toFixed(4));
+    var vh = window.innerHeight;
+    if (hasRail && railLen && mobile.matches) {
+      var tlTop = tl.getBoundingClientRect().top;      // .timeline không bị transform → đo trực tiếp được
+      var rp = clamp01((vh * READ_LINE - (tlTop + railTop)) / railLen);
+      tl.style.setProperty('--vmx-rail-p', rp.toFixed(4));
+      tl.classList.toggle('vmx-rail-full', rp >= 1);
+      mItems.forEach(function (it, i) {
+        var q = clamp01((vh * (READ_LINE + ITEM_BAND) - (tlTop + centers[i])) / (vh * ITEM_BAND));
+        if (it) it.style.setProperty('--vmx-p', q.toFixed(3));
+      });
+    }
+    var sy = window.pageYOffset;
+    steps.forEach(function (el, i) {
+      var p = clamp01((vh * STEP_FROM - (stepTops[i] - sy)) / (vh * (STEP_FROM - STEP_TO)));
+      el.style.setProperty('--vmx-p', p.toFixed(3));
+    });
   }
   function onScroll() {
-    if (!queued) { queued = true; requestAnimationFrame(progress); }
+    if (!queued) { queued = true; requestAnimationFrame(update); }
   }
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', measure);
   mobile.addEventListener('change', measure);
-  if ('ResizeObserver' in window) new ResizeObserver(measure).observe(tl);   // font tải xong / chữ xuống dòng khác
+  if ('ResizeObserver' in window) {            // ảnh phía trên tải xong / mở-đóng accordion Quy trình / chữ xuống dòng khác
+    var ro = new ResizeObserver(measure);
+    ro.observe(document.body);
+    if (hasRail) ro.observe(tl);
+  }
   measure();
 })();
 </script>
