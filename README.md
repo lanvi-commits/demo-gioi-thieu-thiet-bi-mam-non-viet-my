@@ -1,10 +1,10 @@
 # Demo hiệu ứng: trang Giới thiệu Thiết bị mầm non Việt Mỹ
 
-Bản chụp nguyên trang https://website-demo-02.thcmedia.vn/gioi-thieu/ (ngày 21/10/2026). **Không đổi bố cục, nội dung hay cỡ chữ của section nào.** Demo chỉ phủ thêm một lớp hiệu ứng.
+Bản chụp nguyên trang https://website-demo-02.thcmedia.vn/gioi-thieu/ (ngày 21/10/2026). **Không đổi nội dung, cỡ chữ hay thứ tự section nào.** Demo phủ thêm 6 hiệu ứng và thu gọn khoảng cách giữa các section.
 
 **Xem demo:** https://lanvi-commits.github.io/demo-gioi-thieu-thiet-bi-mam-non-viet-my/
 
-Công tắc ở góc dưới trái dùng để bật/tắt lớp hiệu ứng và so trực tiếp với live. Link có `?fx=0` mở thẳng chế độ Tắt (giống site hiện tại).
+Công tắc ở góc dưới trái dùng để bật/tắt bản đề xuất (hiệu ứng + khoảng cách) và so trực tiếp với live. Link có `?fx=0` mở thẳng chế độ Tắt (giống site hiện tại).
 
 ## 6 hiệu ứng thêm (theo tab "Review tổng thể website")
 
@@ -18,6 +18,28 @@ Công tắc ở góc dưới trái dùng để bật/tắt lớp hiệu ứng v�
 | 6 | Slide Đối tác | Nhảy từng ô mỗi 3,5 giây | Trôi đều liên tục, dừng khi rê chuột hoặc khi popover đang mở | 62 |
 
 Trên điện thoại, hiệu ứng hover tự tắt. Máy bật "giảm chuyển động" thì không zoom và slide đứng yên.
+
+## Khoảng cách giữa các section (sheet dòng 114)
+
+Khoảng chuẩn **56px** khi màn hình ≥ 992px, **44px** ở 768–991px, **36px** khi ≤ 767px (biến `--vmx-gap`). Trang ngắn đi 405px ở desktop và 493px ở tablet/mobile.
+
+Bảng dưới là khoảng nhìn thấy, đo từ mép nội dung (chữ, ảnh, ô màu) của section trên tới section dưới, ở khổ 1440px:
+
+| Chỗ nối | Live | Demo | Cách làm |
+|---|---|---|---|
+| Hero → Về Việt Mỹ | 171 | 112 | Mây đáy hero (85px) giữ nguyên; bỏ phần trắng thừa quanh mây |
+| Về Việt Mỹ → Tầm nhìn | 75 | 59 | Section trên chừa 56px, section dưới bỏ padding trên |
+| Tầm nhìn → Hành trình | 127 | 87 | Mây đầu Hành trình (85px) chính là khoảng cách, bỏ padding đáy Tầm nhìn |
+| Hành trình → Giá trị cốt lõi | 73 | 57 | Như trên |
+| Mua theo nhóm → Đội ngũ | 91 | 55 | Như trên |
+| Đội ngũ → Tại sao chọn | 73 | 57 | Như trên |
+| Tại sao chọn → Quy trình | 64 | 56 | Như trên (nền kem nối liền qua ảnh `.bg-bottom`) |
+| Đối tác → Đánh giá | 232 tới tiêu đề | 140 tới tiêu đề | Bỏ trắng thừa phía trên mây vàng, mây giữ nguyên |
+| Đánh giá → Hoạt động thực tế | 108 tới tiêu đề | 56 tới tiêu đề | Cùng nền kem |
+
+Các chỗ nội dung sát dải màu đỏ/cam (Thành tựu, Dự án, Tư vấn viên) vốn đã ≤ 56px nên giữ nguyên, chỉ thu ở tablet/mobile nếu vượt 44/36px.
+
+**Bẫy cho DEV:** ảnh hero cần được cắt khi zoom. Không dùng `overflow: hidden` cho `.media`, mà dùng `overflow: clip`. Lý do: ở khổ ≤ 991px, `.media` là phần tử co giãn; `hidden` làm kích thước tối thiểu của nó về 0, khung co lại 0px và mất ảnh hero (bản demo đầu tiên đã dính lỗi này ở tablet/mobile).
 
 ## Ghi chú cho DEV
 

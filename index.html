@@ -459,9 +459,9 @@ var woocommerce_params = {"ajax_url":"/wp-admin/admin-ajax.php","wc_ajax_url":"/
      CSS site nhúng sẵn (chụp ngày dựng). JS + ảnh tải từ website-demo-02 → cần mạng. -->
 <style id="vmx-fx">
 /* =====================================================================
-   Trang Giới thiệu — lớp hiệu ứng đề xuất 21/10/2026 (user duyệt 6 điểm).
-   Không đổi bố cục / nội dung / cỡ chữ section nào — chỉ hover, zoom, chuyển động.
-   Mọi rule nằm dưới html.vmx-fx = công tắc "Có hiệu ứng" của demo.
+   Trang Giới thiệu — lớp đề xuất 21/10/2026: 6 hiệu ứng (user duyệt) + thu gọn khoảng cách section (mục 7).
+   Không đổi nội dung / cỡ chữ / thứ tự section nào.
+   Mọi rule nằm dưới html.vmx-fx = công tắc "Bản đề xuất" của demo.
    DEV chép sang theme: bỏ tiền tố `html.vmx-fx`, giữ phần còn lại.
 
    Đo trên site 21/10 trước khi viết (đừng làm lại cái đã có):
@@ -484,7 +484,10 @@ var woocommerce_params = {"ajax_url":"/wp-admin/admin-ajax.php","wc_ajax_url":"/
    Ảnh hero nằm trong .media không cắt tràn → phải thêm overflow:hidden, không thì ảnh phóng ra đè chữ.
    .frame của "Tại sao chọn" đã overflow:hidden sẵn.
    --------------------------------------------------------------------- */
-html.vmx-fx #about_hero_story .media { overflow: hidden; }
+/* BẪY (lộ ra 21/10 ở v1): ≤991px .media là phần tử co giãn trong khối dọc — `overflow:hidden` biến nó thành
+   scroll container → kích thước tối thiểu tự động = 0 → khung co về 0px, MẤT ẢNH hero ở tablet/mobile.
+   `overflow: clip` cắt y như hidden nhưng không phải scroll container → khung giữ đúng chiều cao ảnh. */
+html.vmx-fx #about_hero_story .media { overflow: clip; }
 /* theme đặt .frame{pointer-events:none} → :hover không bao giờ khớp. Bật lại cho bộ ảnh đang hiện
    (bộ ẩn có visibility:hidden nên vẫn không nhận chuột, accordion bên phải không bị che) */
 html.vmx-fx #about_why_choose .shot-set.is-active .frame { pointer-events: auto; }
@@ -555,6 +558,44 @@ html.vmx-fx #about_hero_story .btn--secondary:active {
    5–6 · Slide Dự án + Đối tác trôi liên tục → hieu-ung-pre.js (extension AutoScroll của Splide).
    Không cần CSS: AutoScroll dịch .splide__list bằng transform, giống Splide gốc.
    --------------------------------------------------------------------- */
+
+/* ---------------------------------------------------------------------
+   7 · THU GỌN KHOẢNG CÁCH GIỮA SECTION (sheet dòng 114) — user chốt 56 / 44 / 36px.
+   Đo live 21/10 (1440): khoảng nhìn thấy giữa 2 section 72–272px, phần lớn do section trên chừa 40–64px
+   CỘNG section dưới chừa thêm 32px.
+   Quy tắc (giống mockup Giới thiệu 16/10):
+   a) 2 section nền trắng liền nhau → section trên chừa ĐÚNG 1 khoảng, section dưới bỏ padding trên.
+   b) Khoảng nội dung ↔ mép dải màu (đỏ Thành tựu, cam Dự án, đỏ Tư vấn viên) đã ≤ khoảng chuẩn → giữ, chỉ kéo chỗ thừa.
+   c) Mép có MÂY (đáy hero, đỉnh Hành trình, đỉnh nền vàng Đánh giá): mây thật cao 85px, giữ nguyên, không cắt;
+      chỉ bỏ phần trắng thừa quanh mây. Mây hero có z-index 5 (vẽ ĐÈ nội dung) → nội dung phải đứng trên đỉnh mây.
+   Breakpoint theo theme: ≥992 · 768–991 · ≤767.
+   --------------------------------------------------------------------- */
+html.vmx-fx { --vmx-gap: 56px; }
+@media (max-width: 991px) { html.vmx-fx { --vmx-gap: 44px; } }
+@media (max-width: 767px) { html.vmx-fx { --vmx-gap: 36px; } }
+
+/* hero → Về Việt Mỹ: đáy hero = mây 85px + nửa khoảng chuẩn giữa ảnh/nút và đỉnh mây (live: 140 / 140 / 120) */
+html.vmx-fx #about_hero_story .panel { padding-bottom: calc(85px + var(--vmx-gap) / 2); }
+html.vmx-fx #about_story { padding-top: 0; padding-bottom: var(--vmx-gap); }
+/* Về Việt Mỹ → Tầm nhìn (a) · Tầm nhìn → Hành trình (c): mây đầu Hành trình đã là khoảng cách → bỏ đáy Tầm nhìn */
+html.vmx-fx #about_vision_mission { padding-top: 0; padding-bottom: 0; }
+/* Hành trình → Giá trị cốt lõi (a) */
+html.vmx-fx #about_journey { padding-bottom: var(--vmx-gap); }
+html.vmx-fx #about_core_values { padding-top: 0; padding-bottom: min(40px, var(--vmx-gap)); }   /* (b) tới sóng đỏ */
+/* Mua theo nhóm → Đội ngũ → Tại sao chọn (a) */
+html.vmx-fx #shop_category_groups { padding-bottom: var(--vmx-gap); }
+html.vmx-fx #about_team { padding-top: 0; padding-bottom: var(--vmx-gap); }
+html.vmx-fx #about_why_choose { padding-top: 0; padding-bottom: var(--vmx-gap); }
+/* Tại sao chọn → Quy trình: nền kem nối liền qua ảnh .bg-bottom → coi như (a) */
+html.vmx-fx #about_process { padding-top: 0; padding-bottom: calc(var(--vmx-gap) - 14px); }  /* (b) răng cưa cam thò lên 14px */
+/* Dự án (dải cam): chấm phân trang → mép dưới dải cam */
+html.vmx-fx #featured_projects { padding-bottom: calc(var(--vmx-gap) - 12px); }                /* chấm có 12px đệm dưới sẵn */
+/* Đối tác → Đánh giá (c): bỏ trắng thừa trên mây vàng */
+html.vmx-fx #partner_logos { padding-top: min(32px, calc(var(--vmx-gap) - 14px)); padding-bottom: 0; }
+html.vmx-fx #customer_testimonials { padding-top: 0; }
+/* Đánh giá → Hoạt động thực tế: cùng nền kem (a) */
+html.vmx-fx #customer_testimonials .panel { padding-bottom: var(--vmx-gap); }
+html.vmx-fx #about_activity_gallery { padding-top: 0; padding-bottom: min(48px, var(--vmx-gap)); }  /* (b) tới sóng đỏ */
 
 /* Giảm chuyển động: bỏ zoom + co/nhấc, giữ đổi màu (slide đứng yên — xử lý trong hieu-ung-pre.js) */
 @media (prefers-reduced-motion: reduce) {
@@ -5253,8 +5294,8 @@ var e="script#wp-emoji-settings",t=document.querySelector(e);if(!(t instanceof H
 })();
 </script>
 <script id="vmx-fx-js">
-/* Công tắc demo "Hiệu ứng đề xuất: Bật / Tắt" — không thuộc giao diện site, DEV không chép.
-   Bật  = html.vmx-fx (CSS hieu-ung.css) + slider trôi liên tục (hieu-ung-pre.js).
+/* Công tắc demo "Đề xuất (hiệu ứng + khoảng cách): Bật / Tắt" — không thuộc giao diện site, DEV không chép.
+   Bật  = html.vmx-fx (CSS hieu-ung.css: hiệu ứng + khoảng cách section) + slider trôi liên tục (hieu-ung-pre.js).
    Tắt  = trang y như live. Link có ?fx=0 mở thẳng chế độ Tắt (để gửi link so sánh). */
 (function () {
   'use strict';
@@ -5264,9 +5305,9 @@ var e="script#wp-emoji-settings",t=document.querySelector(e);if(!(t instanceof H
   btn.type = 'button';
   btn.className = 'vmx-toggle';
   btn.setAttribute('role', 'switch');
-  btn.setAttribute('aria-label', 'Hiệu ứng đề xuất');   // trạng thái Bật/Tắt đọc qua aria-checked
+  btn.setAttribute('aria-label', 'Bản đề xuất: hiệu ứng và khoảng cách section');   // trạng thái Bật/Tắt đọc qua aria-checked
   btn.innerHTML = '<span class="vmx-toggle__track" aria-hidden="true"><span class="vmx-toggle__thumb"></span></span>' +
-                  '<span>Hiệu ứng<span class="vmx-toggle__long"> đề xuất</span>: <span class="vmx-toggle__state"></span></span>';
+                  '<span>Đề xuất<span class="vmx-toggle__long"> (hiệu ứng + khoảng cách)</span>: <span class="vmx-toggle__state"></span></span>';
   var state = btn.querySelector('.vmx-toggle__state');
 
   function render() {
