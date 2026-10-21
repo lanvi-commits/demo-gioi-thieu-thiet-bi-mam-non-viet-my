@@ -574,8 +574,7 @@ html.vmx-fx { --vmx-gap: 56px; }
 @media (max-width: 991px) { html.vmx-fx { --vmx-gap: 44px; } }
 @media (max-width: 767px) { html.vmx-fx { --vmx-gap: 36px; } }
 
-/* hero → Về Việt Mỹ: đáy hero = mây 85px + nửa khoảng chuẩn giữa ảnh/nút và đỉnh mây (live: 140 / 140 / 120) */
-html.vmx-fx #about_hero_story .panel { padding-bottom: calc(85px + var(--vmx-gap) / 2); }
+/* hero → Về Việt Mỹ: đáy hero = mây 85px + khoảng thở trên đỉnh mây → xem mục 9 (live: 140 / 140 / 120) */
 html.vmx-fx #about_story { padding-top: 0; padding-bottom: var(--vmx-gap); }
 /* Về Việt Mỹ → Tầm nhìn (a) · Tầm nhìn → Hành trình (c): mây đầu Hành trình đã là khoảng cách → bỏ đáy Tầm nhìn */
 html.vmx-fx #about_vision_mission { padding-top: 0; padding-bottom: 0; }
@@ -596,6 +595,35 @@ html.vmx-fx #customer_testimonials { padding-top: 0; }
 /* Đánh giá → Hoạt động thực tế: cùng nền kem (a) */
 html.vmx-fx #customer_testimonials .panel { padding-bottom: var(--vmx-gap); }
 html.vmx-fx #about_activity_gallery { padding-top: 0; padding-bottom: min(48px, var(--vmx-gap)); }  /* (b) tới sóng đỏ */
+
+/* ---------------------------------------------------------------------
+   9 · HERO GỌN HƠN (user 21/10: "bỏ dấu mũi tên trên hero banner… thu gọn khoảng cách").
+   a) Bỏ nút "→" (.more) và hiện ĐỦ đoạn mô tả (user chọn "hiện đủ ở mọi khổ").
+      Nút này là cách DUY NHẤT để mở phần bị cắt còn 4 dòng → bỏ nút thì phải bỏ luôn việc cắt.
+      about-hero-story.js vẫn ghi max-height inline lên .desc-body → cần !important để thắng.
+      DEV làm thật: xoá <button class="more"> + class is-collapsed / data-about-hero-desc trong template
+      và gỡ about-hero-story.js (file chỉ phục vụ nút này, kể cả phần đọc màu nền bằng canvas).
+   b) Khoảng trong hero, live → demo (≥992 / 768–991 / ≤767):
+      đỉnh hero → nội dung           88 / 80 / 64  →  32 / 32 / 24
+        (live = 32 của section + 56 / 48 / 32 của .panel. 32px kia là LỖI CASCADE: theme khai
+         .about_hero_story { padding: 0 } nhưng thua rule chung `section:not(:first-child) { padding-top: 2rem }`
+         ở style-base.css (độ ưu tiên 0,1,1 > 0,1,0) → nền hero bị đệm thêm 32px phía trên.)
+      nhãn ↔ H1 ↔ mô tả              24 / 24 / 16  →  16 / 16 / 12
+      mô tả → nút CTA                24 / 24 / 16  →  24 / 24 / 16 (giữ, để nút tách khỏi khối chữ)
+      chữ ↔ ảnh khi xếp dọc           –  / 32 / 32  →   – / 24 / 24
+      đáy ảnh/nút → đỉnh mây (85px)  55 / 55 / 35  →  16 / 16 / 12
+   --------------------------------------------------------------------- */
+html.vmx-fx { --vmx-hero-top: 32px; --vmx-hero-gap: 16px; --vmx-hero-cta: 8px; --vmx-hero-air: 16px; }
+@media (max-width: 767px) { html.vmx-fx { --vmx-hero-top: 24px; --vmx-hero-gap: 12px; --vmx-hero-cta: 4px; --vmx-hero-air: 12px; } }
+
+html.vmx-fx #about_hero_story .more { display: none; }
+html.vmx-fx #about_hero_story .desc-body { max-height: none !important; }
+
+html.vmx-fx #about_hero_story { padding-top: 0; }
+html.vmx-fx #about_hero_story .panel { padding-top: var(--vmx-hero-top); padding-bottom: calc(85px + var(--vmx-hero-air)); }
+html.vmx-fx #about_hero_story .copy { gap: var(--vmx-hero-gap); }
+html.vmx-fx #about_hero_story .actions { margin-top: var(--vmx-hero-cta); }   /* cộng gap → 24 / 24 / 16 */
+@media (max-width: 991px) { html.vmx-fx #about_hero_story .layout { gap: 24px; } }
 
 /* Giảm chuyển động: bỏ zoom + co/nhấc, giữ đổi màu (slide đứng yên — xử lý trong hieu-ung-pre.js) */
 @media (prefers-reduced-motion: reduce) {

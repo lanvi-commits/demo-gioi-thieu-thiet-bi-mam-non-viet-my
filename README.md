@@ -1,10 +1,10 @@
 # Demo hiệu ứng: trang Giới thiệu Thiết bị mầm non Việt Mỹ
 
-Bản chụp nguyên trang https://website-demo-02.thcmedia.vn/gioi-thieu/ (ngày 21/10/2026). **Không đổi nội dung, cỡ chữ hay thứ tự section nào.** Demo phủ thêm 6 hiệu ứng, thu gọn khoảng cách giữa các section và chỉnh cỡ chữ theo tab "Size chữ".
+Bản chụp nguyên trang https://website-demo-02.thcmedia.vn/gioi-thieu/ (ngày 21/10/2026). **Không đổi nội dung hay thứ tự section nào.** Demo phủ thêm 6 hiệu ứng, thu gọn khoảng cách giữa các section, chỉnh cỡ chữ theo tab "Size chữ" và làm gọn hero.
 
 **Xem demo:** https://lanvi-commits.github.io/demo-gioi-thieu-thiet-bi-mam-non-viet-my/
 
-Công tắc ở góc dưới trái dùng để bật/tắt bản đề xuất (hiệu ứng, khoảng cách, cỡ chữ) và so trực tiếp với live. Link có `?fx=0` mở thẳng chế độ Tắt (giống site hiện tại).
+Công tắc ở góc dưới trái dùng để bật/tắt bản đề xuất (hiệu ứng, khoảng cách, cỡ chữ, hero) và so trực tiếp với live. Link có `?fx=0` mở thẳng chế độ Tắt (giống site hiện tại).
 
 ## 6 hiệu ứng thêm (theo tab "Review tổng thể website")
 
@@ -27,7 +27,7 @@ Bảng dưới là khoảng nhìn thấy, đo từ mép nội dung (chữ, ảnh
 
 | Chỗ nối | Live | Demo | Cách làm |
 |---|---|---|---|
-| Hero → Về Việt Mỹ | 171 | 112 | Mây đáy hero (85px) giữ nguyên; bỏ phần trắng thừa quanh mây |
+| Hero → Về Việt Mỹ | 171 | 100 | Mây đáy hero (85px) giữ nguyên; bỏ phần trắng thừa quanh mây (xem mục Hero) |
 | Về Việt Mỹ → Tầm nhìn | 75 | 59 | Section trên chừa 56px, section dưới bỏ padding trên |
 | Tầm nhìn → Hành trình | 127 | 87 | Mây đầu Hành trình (85px) chính là khoảng cách, bỏ padding đáy Tầm nhìn |
 | Hành trình → Giá trị cốt lõi | 73 | 57 | Như trên |
@@ -40,6 +40,25 @@ Bảng dưới là khoảng nhìn thấy, đo từ mép nội dung (chữ, ảnh
 Các chỗ nội dung sát dải màu đỏ/cam (Thành tựu, Dự án, Tư vấn viên) vốn đã ≤ 56px nên giữ nguyên, chỉ thu ở tablet/mobile nếu vượt 44/36px.
 
 **Bẫy cho DEV:** ảnh hero cần được cắt khi zoom. Không dùng `overflow: hidden` cho `.media`, mà dùng `overflow: clip`. Lý do: ở khổ ≤ 991px, `.media` là phần tử co giãn; `hidden` làm kích thước tối thiểu của nó về 0, khung co lại 0px và mất ảnh hero (bản demo đầu tiên đã dính lỗi này ở tablet/mobile).
+
+## Hero gọn hơn
+
+- **Bỏ mũi tên "→"** ở cuối đoạn mô tả. Mũi tên này là nút duy nhất để mở phần chữ đang bị cắt còn 4 dòng, nên bản demo **hiện đủ đoạn mô tả** ở mọi khổ.
+- **Thu khoảng trong hero** (đơn vị px, theo thứ tự ≥ 992 / 768–991 / ≤ 767):
+
+| Khoảng | Site hiện tại | Demo |
+|---|---|---|
+| Mép trên hero → nội dung | 88 / 80 / 64 | 32 / 32 / 24 |
+| Nhãn "Kể từ năm 2013" ↔ H1 ↔ mô tả | 24 / 24 / 16 | 16 / 16 / 12 |
+| Mô tả → nút | 24 / 24 / 16 | giữ nguyên |
+| Chữ ↔ ảnh (khi xếp dọc) | – / 32 / 32 | – / 24 / 24 |
+| Đáy ảnh/nút → đỉnh mây | 55 / 55 / 35 | 16 / 16 / 12 |
+
+Chiều cao hero: 709 → 614 (1440) · 602 → 553 (1200) · 1031 → 982 (820) · 829 → 943 (390). Ở mobile hero cao hơn trước vì đoạn mô tả giờ hiện đủ (+200px), phần khoảng cách thu lại được 86px.
+
+**Cho DEV:**
+- Làm thật thì xoá `<button class="more">` cùng class `is-collapsed` và `data-about-hero-desc` trong template, rồi gỡ `about-hero-story.js`. File này chỉ phục vụ nút mũi tên, gồm cả phần đọc màu nền bằng canvas.
+- 32px trong số 88px ở mép trên là **lỗi cascade**. Theme khai `.about_hero_story { padding: 0 }`, nhưng rule chung `section:not(:first-child) { padding-top: 2rem }` trong `style-base.css` có độ ưu tiên cao hơn (0,1,1 so với 0,1,0) nên vẫn chèn thêm 32px.
 
 ## Cỡ chữ (theo tab "Size chữ" của sheet Brief)
 
