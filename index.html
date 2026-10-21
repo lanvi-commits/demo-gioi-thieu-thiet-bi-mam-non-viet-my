@@ -478,6 +478,8 @@ var woocommerce_params = {"ajax_url":"/wp-admin/admin-ajax.php","wc_ajax_url":"/
   --card-hover-shadow: 0 8px 24px rgba(17, 25, 39, .08); /* = bóng hover thẻ Đối tác, cùng rule trên */
   --journey-line: #c50f0f;                    /* = màu đậm giữa thanh Hành trình desktop của theme */
   --journey-track: rgba(197, 15, 15, .1);     /* = màu mờ 2 đầu thanh desktop */
+  --process-track: rgba(215, 16, 16, .12);    /* ≈ đoạn nối Quy trình của theme (đỏ .2 × opacity .5) */
+  --rail-halo: rgba(215, 16, 16, .12);        /* quầng mờ quanh ô đang đứng (video mẫu) */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
 }
@@ -719,7 +721,7 @@ html.vmx-fx #about_journey .marker::after {
     animation: vmx-journey-ripple 1200ms var(--ease-out) calc(var(--vmx-delay, 0ms) + 600ms) 2;
   }
 }
-/* 11b · ≤767: THANH DỌC CHẠY THEO CUỘN (v7, user 21/10: "ở mobile thì thanh đỏ… hiện dần khi cuộn xuống và ẩn dần khi cuộn lên").
+/* 11b · ≤767: THANH DỌC CHẠY THEO CUỘN + ICON SÁNG DẦN (v7 → v9, user 21/10: "ở mobile thì thanh đỏ… hiện dần khi cuộn xuống và ẩn dần khi cuộn lên").
    Live: theme ẩn thanh ở ≤991, mốc xếp dọc, chữ căn giữa ngay dưới icon → thanh dọc chạy giữa sẽ đè lên chữ.
    Nên đổi mốc sang kiểu trục trái (giống khối Quy trình cùng trang): icon trái, chữ căn trái bên phải, thanh chạy qua tâm icon.
    ::before = rãnh mờ đủ dài · ::after = thanh đỏ, scaleY theo --vmx-rail-p (0 → 1) do hieu-ung-cuon.js đặt mỗi khung cuộn.
@@ -742,13 +744,23 @@ html.vmx-fx #about_journey .marker::after {
     transform-origin: 50% 0;
     transform: scaleY(var(--vmx-rail-p, 0));
   }
-  /* v8 (user: "các ô sẽ hiện dần… cùng với thanh đỏ"): ô mốc rõ dần ngay trước khi đầu thanh chạm icon, chạm là đủ;
-     cuộn lên thanh rút qua thì mờ lại. --vmx-p do JS đặt mỗi khung cuộn — KHÔNG transition, không thì ô trễ sau thanh.
-     Chưa có --vmx-p (JS lỗi) → 1 = hiện như thường. */
-  html.vmx-fx #about_journey .item {
-    opacity: var(--vmx-p, 1);
-    translate: 0 calc((1 - var(--vmx-p, 1)) * 16px);
+  /* v9 — theo video mẫu: chữ mốc ĐỨNG YÊN; icon chưa tới = tắt (nền trắng, icon xám nhạt), thanh chạm tâm icon →
+     sáng dần thành tròn đỏ như live (0,4s); icon đang đứng có quầng mờ. Cuộn lên thanh rút qua thì tắt lại.
+     .vmx-reached / .vmx-current do hieu-ung-cuon.js gắn lên .item. Nền đỏ là gradient (không transition được) →
+     vẽ ở lớp ::before, chỉ đổi opacity; isolation giữ lớp đó nằm dưới ảnh icon. */
+  html.vmx-fx #about_journey .icon {
+    position: relative; isolation: isolate; background: #ffffff;
+    transition: box-shadow .4s ease, transform 250ms var(--ease-out);
   }
+  html.vmx-fx #about_journey .icon::before {
+    content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit;
+    background: linear-gradient(180deg, var(--primary_color, #d71010) 0%, #930b0b 100%);
+    opacity: 0; transition: opacity .4s ease;
+  }
+  html.vmx-fx #about_journey .icon-img { filter: brightness(0) opacity(.3); transition: filter .4s ease; }
+  html.vmx-fx #about_journey .item.vmx-reached .icon::before { opacity: 1; }
+  html.vmx-fx #about_journey .item.vmx-reached .icon-img { filter: none; }
+  html.vmx-fx #about_journey .item.vmx-current .icon { box-shadow: 0 0 0 6px var(--rail-halo); }
   /* thanh chạy tới mốc cuối → mốc "Hiện tại" toả 2 vòng sóng (mỗi lần thanh chạy hết lại diễn lại) */
   html.vmx-fx #about_journey .timeline.vmx-rail-full .item:last-child .marker::after {
     animation: vmx-journey-ripple 1200ms var(--ease-out) 2;
@@ -776,27 +788,57 @@ html.vmx-fx #about_journey .marker::after {
 }
 
 /* ---------------------------------------------------------------------
-   13 · QUY TRÌNH TƯ VẤN — HIỆN DẦN KHI CUỘN XUỐNG, ẨN DẦN KHI CUỘN LÊN (user 21/10, desktop + mobile).
-   v8: CHẠY THEO VỊ TRÍ CUỘN. Mỗi bước (số + đoạn nối + thẻ) mờ ↔ rõ + trượt 24px theo --vmx-p (JS đặt mỗi khung cuộn):
-   mép trên bước ở đáy màn hình = 0, lên tới 75% chiều cao màn hình = 1. Cuộn lên thì lùi lại ngay trong dải 25% đáy
-   màn hình — thấy được. (v7 gỡ is-in khi bước trôi xuống 10% đáy → mờ lúc đã sắp khuất, user "chưa thấy hiệu ứng".)
-   Không transition: giá trị đi theo tay cuộn, có transition sẽ trễ.
-   Dùng `translate` thay vì `transform` để không đụng transform nào của theme / accordion.
-   Live: đứng yên, accordion mở/đóng bằng `hidden` (không trượt) — giữ nguyên, không đụng.
+   13 · QUY TRÌNH TƯ VẤN — THANH LIỀN + Ô SỐ SÁNG DẦN THEO CUỘN (user 21/10, desktop + mobile, theo video mẫu).
+   Mẫu: timeline dọc, thẻ ĐỨNG YÊN; thanh dài ra khi cuộn xuống, ngắn lại khi cuộn lên; ô số chưa tới = viền rỗng,
+   thanh chạm tới → tô đầy (≈0,4s); ô đang đứng có quầng mờ; thanh rút qua → trở lại rỗng.
+   (v7–v8 làm mờ/trượt cả thẻ — user "không phải" → bỏ.)
+   - Thanh liền nối tâm số đầu → tâm số cuối thay cho các đoạn nối rời của theme (.line: ẩn bằng visibility để giữ
+     nguyên chiều cao bố cục). ::before = rãnh mờ · ::after = thanh đỏ, scaleY theo --vmx-rail-p (JS mỗi khung cuộn).
+   - Ô số: live tô đầy số của bước ĐANG MỞ accordion. Ở đây màu số do vị trí cuộn quyết → bỏ kiểu tô của .is-open
+     (thẻ đang mở vẫn giữ viền đỏ như live). Nền đỏ là gradient → lớp ::before đổi opacity.
+   - Tâm số: desktop/tablet 24px (số 48px), mobile 20px (số 40px).
+   Live: accordion mở/đóng bằng `hidden` — giữ nguyên, không đụng.
    --------------------------------------------------------------------- */
-html.vmx-fx #about_process .item {
-  opacity: var(--vmx-p, 1);
-  translate: 0 calc((1 - var(--vmx-p, 1)) * 24px);
+html.vmx-fx #about_process .timeline { position: relative; }
+html.vmx-fx #about_process .rail { position: relative; z-index: 1; }
+html.vmx-fx #about_process .line { visibility: hidden; }
+html.vmx-fx #about_process .timeline::before,
+html.vmx-fx #about_process .timeline::after {
+  content: ""; position: absolute; z-index: 0; border-radius: 4px;
+  top: var(--vmx-rail-top, 24px); height: var(--vmx-rail-h, 0px);
 }
+html.vmx-fx #about_process .timeline::before { left: 23px; width: 2px; background: var(--process-track); }
+html.vmx-fx #about_process .timeline::after {
+  left: 22px; width: 4px; background: var(--primary_color, #d71010);
+  transform-origin: 50% 0; transform: scaleY(var(--vmx-rail-p, 0));
+}
+@media (max-width: 767.98px) {
+  html.vmx-fx #about_process .timeline::before { left: 19px; }
+  html.vmx-fx #about_process .timeline::after { left: 18px; }
+}
+html.vmx-fx #about_process .num {
+  position: relative; isolation: isolate;
+  transition: color .4s ease, box-shadow .4s ease;
+}
+html.vmx-fx #about_process .num::before {
+  content: ""; position: absolute; inset: -2px; z-index: -1; border-radius: inherit;       /* phủ cả viền 2px */
+  background: linear-gradient(180deg, var(--primary_color, #d71010) 0%, #930b0b 100%);
+  opacity: 0; transition: opacity .4s ease;
+}
+/* bỏ kiểu tô của bước đang mở (theme: .item.is-open .num) — trả về ô rỗng như các số khác */
+html.vmx-fx #about_process .item.is-open .num {
+  color: var(--primary_color, #d71010); background: #ffffff; box-shadow: none;
+}
+html.vmx-fx #about_process .item.vmx-reached .num { color: #ffffff; }
+html.vmx-fx #about_process .item.vmx-reached .num::before { opacity: 1; }
+html.vmx-fx #about_process .item.vmx-current .num { box-shadow: 0 0 0 6px var(--rail-halo); }
 
-/* Giảm chuyển động: thanh dọc Hành trình mobile hiện đủ, không chạy theo cuộn, không sóng · ô mốc mobile + Quy trình
-   chỉ mờ ↔ rõ theo cuộn, không trượt */
+/* Giảm chuyển động: thanh đầy sẵn, mọi ô sáng sẵn (JS cũng coi như đã chạm hết), không chuyển màu dần, không sóng */
 @media (prefers-reduced-motion: reduce) {
-  html.vmx-fx #about_journey .timeline::after { transform: none; }
-  html.vmx-fx #about_process .item { translate: none; }
-}
-@media (prefers-reduced-motion: reduce) and (max-width: 767.98px) {
-  html.vmx-fx #about_journey .item { translate: none; transition: none; }
+  html.vmx-fx #about_journey .timeline::after,
+  html.vmx-fx #about_process .timeline::after { transform: none; }
+  html.vmx-fx #about_journey .icon, html.vmx-fx #about_journey .icon::before, html.vmx-fx #about_journey .icon-img,
+  html.vmx-fx #about_process .num, html.vmx-fx #about_process .num::before { transition: none; }
 }
 
 /* =====================================================================
@@ -5566,16 +5608,13 @@ var e="script#wp-emoji-settings",t=document.querySelector(e);if(!(t instanceof H
    2 kiểu:
      hiện 1 lần        Tầm nhìn, Hành trình, Giá trị cốt lõi — lọt màn hình thì gắn is-in, CSS chạy transition, cuộn
                        ngược lên không diễn lại
-     theo vị trí cuộn  Quy trình + thanh dọc Hành trình ≤767 (user 21/10: "hiện dần khi cuộn xuống và ẩn dần khi cuộn
-                       lên") — mỗi khung cuộn tính tiến độ 0…1 theo vị trí trên màn hình → CSS vẽ theo biến. Dừng cuộn ở
-                       đâu thì đứng ở đó, cuộn lên thì lùi lại NGAY trong vùng nhìn thấy.
-                       (v7 dùng kiểu "gỡ is-in khi trôi xuống 10% đáy" → bước mờ đi lúc đã sắp ra khỏi màn hình, user
-                       báo "cuộn lên chưa thấy hiệu ứng" → v8 đổi sang kiểu này.)
+     theo vị trí cuộn  Quy trình (mọi khổ) + Hành trình ≤767 — thanh liền chạy theo cuộn, ô số/icon sáng dần khi thanh
+                       chạm tới, cuộn lên thì tắt lại (theo video mẫu user gửi 21/10). Thẻ nội dung đứng yên.
 
    Hành trình có 3 kiểu, CSS tự chọn theo khổ:
      ≥992px     cả dải mốc là 1 khối (.timeline): thanh ngang vẽ từ trái sang, mốc bật ra khi thanh chạm tới
      768–991px  theme ẩn thanh, mốc xếp lưới 2 cột → từng mốc (.item) hiện khi cuộn tới
-     ≤767px     mốc xếp dọc, icon bên trái: thanh dọc + các ô mốc chạy theo cuộn (--vmx-rail-p, --vmx-p trên .item)
+     ≤767px     mốc xếp dọc, icon bên trái: thanh dọc chạy theo cuộn, icon sáng dần khi thanh chạm tới
    → quan sát cả .timeline lẫn từng .item; CSS mỗi khổ chỉ dùng phần của khổ đó. */
 (function () {
   'use strict';
@@ -5650,68 +5689,69 @@ var e="script#wp-emoji-settings",t=document.querySelector(e);if(!(t instanceof H
   var ioUnit = new IntersectionObserver(reveal, { rootMargin: '0px 0px -25% 0px', threshold: 0.5 });
   targets.forEach(function (el) { (cfgOf.has(el) ? ioCard : ioUnit).observe(el); });
 
-  /* THEO VỊ TRÍ CUỘN — 1 vòng requestAnimationFrame cho cả 2 phần dưới, đo lại khi bố cục đổi (ảnh tải, mở accordion…).
-     Đo bằng offsetTop (không tính transform) vì phần tử đang trượt → getBoundingClientRect lệch theo chính độ trượt.
-     Cộng dồn offsetTop ngược lên. Đừng lấy list.offsetTop + marker.offsetTop: mốc đang ẩn có transform → Chrome lấy
-     chính .item làm offsetParent của icon → mọi icon đo ra 0, thanh dài 0px (gặp thật 21/10). */
-  function offsetY(el, stop) {
+  /* THEO VỊ TRÍ CUỘN — làm theo video mẫu user gửi 21/10 (timeline dọc: thẻ ĐỨNG YÊN, thanh liền chạy theo cuộn,
+     ô số từ viền rỗng → tô đầy khi thanh chạm tới, ô đang đứng có quầng mờ; cuộn lên thanh rút qua thì ô trở lại rỗng).
+     Áp cho 2 khối:
+       Hành trình  chỉ ≤767 (mốc xếp dọc, icon trái) — ô = icon tròn
+       Quy trình   mọi khổ — ô = số 1…5 (.num), thanh liền thay cho các đoạn nối rời của theme
+     Mỗi khung cuộn (rAF): đầu thanh = đường đọc 60% chiều cao màn hình → --vmx-rail-p 0…1 (CSS vẽ bằng scaleY);
+     ô có tâm đã lên quá đường đọc → .vmx-reached trên .item; ô cuối cùng trong số đó → .vmx-current (quầng mờ).
+     Ô đổi trạng thái bằng transition CSS 0,4s (như mẫu), chỉ thanh là bám tay cuộn.
+     Vị trí tâm ô đo theo toạ độ trang (cộng dồn offsetTop, không tính transform), đo lại khi bố cục đổi
+     (ảnh tải, mở/đóng accordion Quy trình, xoay màn hình). Giảm chuyển động: thanh đầy, mọi ô sáng sẵn.
+     (v7–v8 làm mờ/trượt cả thẻ theo cuộn — user: "không phải" + gửi video mẫu → v9 bỏ, thẻ đứng yên.) */
+  function docY(el) {
     var y = 0;
-    for (; el && el !== stop; el = el.offsetParent) y += el.offsetTop;
+    for (; el; el = el.offsetParent) y += el.offsetTop;
     return y;
   }
   function clamp01(v) { return Math.min(1, Math.max(0, v)); }
+  var READ_LINE = 0.6;
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-  // a) ≤767 · Hành trình: thanh dọc + các ô mốc đi CÙNG NHAU (user 21/10: "các ô sẽ hiện dần khi cuộn xuống và ẩn dần
-  //    khi cuộn lên cùng với thanh đỏ, không phải chỉ có thanh đỏ").
-  //    Thanh nối tâm icon mốc đầu → tâm icon mốc cuối (--vmx-rail-top / --vmx-rail-h). Đầu thanh = đường đọc 60% chiều
-  //    cao màn hình → --vmx-rail-p 0…1, CSS vẽ bằng scaleY.
-  //    Ô mốc rõ dần trong 15% màn hình ngay trước khi đầu thanh chạm icon, chạm là hiện đủ (--vmx-p trên .item);
-  //    cuộn lên, thanh rút qua icon nào thì ô đó mờ dần theo. Thanh chạy hết → .vmx-rail-full (mốc cuối toả sóng).
-  var tl = document.querySelector('#about_journey .timeline');
-  var markers = tl ? [].slice.call(tl.querySelectorAll('.marker')) : [];
-  var mItems = markers.map(function (m) { return m.closest('.item'); });
-  var hasRail = !!tl && markers.length > 1;
-  var mobile = window.matchMedia('(max-width: 767.98px)');
-  var READ_LINE = 0.6, ITEM_BAND = 0.15;
-  var railTop = 0, railLen = 0, centers = [];
-
-  // b) Quy trình (desktop + mobile): mép trên mỗi bước ở ĐÁY màn hình → 0 (ẩn), lên tới 75% chiều cao màn hình → 1
-  //    (hiện đủ) → --vmx-p trên từng bước, CSS vẽ mờ ↔ rõ + trượt 24px. Cuộn lên thì lùi lại trong dải 25% đáy màn hình.
-  var steps = [].slice.call(document.querySelectorAll('#about_process .item'));
-  var STEP_FROM = 1, STEP_TO = 0.75;
-  var stepTops = [];
-  if (!hasRail && !steps.length) return;
+  var rails = [
+    { tl: '#about_journey .timeline', dot: '.icon', mq: '(max-width: 767.98px)' },
+    { tl: '#about_process .timeline', dot: '.num', mq: 'all' }
+  ].map(function (r) {
+    var tl = document.querySelector(r.tl);
+    var dots = tl ? [].slice.call(tl.querySelectorAll(r.dot)) : [];
+    return { tl: tl, dots: dots, items: dots.map(function (d) { return d.closest('.item'); }),
+             mq: window.matchMedia(r.mq), top: 0, len: 0, centers: [], cur: -2 };
+  }).filter(function (r) { return r.tl && r.dots.length > 1; });
+  if (!rails.length) return;
 
   function measure() {
-    if (hasRail && mobile.matches) {
-      centers = markers.map(function (m) { return offsetY(m, tl) + m.offsetHeight / 2; });   // tâm icon, tính từ đỉnh .timeline
-      railTop = centers[0];
-      railLen = Math.max(0, centers[centers.length - 1] - railTop);
-      tl.style.setProperty('--vmx-rail-top', railTop + 'px');
-      tl.style.setProperty('--vmx-rail-h', railLen + 'px');
-    }
-    stepTops = steps.map(function (el) { return offsetY(el, null); });   // toạ độ tính từ đầu trang
+    rails.forEach(function (r) {
+      if (!r.mq.matches) return;
+      var base = docY(r.tl);
+      r.centers = r.dots.map(function (d) { return docY(d) - base + d.offsetHeight / 2; });   // tâm ô, tính từ đỉnh .timeline
+      r.top = r.centers[0];
+      r.len = Math.max(0, r.centers[r.centers.length - 1] - r.top);
+      r.tl.style.setProperty('--vmx-rail-top', r.top + 'px');
+      r.tl.style.setProperty('--vmx-rail-h', r.len + 'px');
+    });
     update();
   }
 
   var queued = false;
   function update() {
     queued = false;
-    var vh = window.innerHeight;
-    if (hasRail && railLen && mobile.matches) {
-      var tlTop = tl.getBoundingClientRect().top;      // .timeline không bị transform → đo trực tiếp được
-      var rp = clamp01((vh * READ_LINE - (tlTop + railTop)) / railLen);
-      tl.style.setProperty('--vmx-rail-p', rp.toFixed(4));
-      tl.classList.toggle('vmx-rail-full', rp >= 1);
-      mItems.forEach(function (it, i) {
-        var q = clamp01((vh * (READ_LINE + ITEM_BAND) - (tlTop + centers[i])) / (vh * ITEM_BAND));
-        if (it) it.style.setProperty('--vmx-p', q.toFixed(3));
+    var line = window.innerHeight * READ_LINE;
+    rails.forEach(function (r) {
+      if (!r.mq.matches || !r.len) return;
+      var tlTop = r.tl.getBoundingClientRect().top;    // .timeline không bị transform → đo trực tiếp được
+      var p = reduce.matches ? 1 : clamp01((line - (tlTop + r.top)) / r.len);
+      r.tl.style.setProperty('--vmx-rail-p', p.toFixed(4));
+      r.tl.classList.toggle('vmx-rail-full', p >= 1);
+      var cur = -1;
+      r.centers.forEach(function (c, i) { if (reduce.matches || tlTop + c <= line) cur = i; });
+      if (cur === r.cur) return;                       // chỉ đụng class khi có ô đổi trạng thái
+      r.cur = cur;
+      r.items.forEach(function (it, i) {
+        if (!it) return;
+        it.classList.toggle('vmx-reached', i <= cur);
+        it.classList.toggle('vmx-current', i === cur);
       });
-    }
-    var sy = window.pageYOffset;
-    steps.forEach(function (el, i) {
-      var p = clamp01((vh * STEP_FROM - (stepTops[i] - sy)) / (vh * (STEP_FROM - STEP_TO)));
-      el.style.setProperty('--vmx-p', p.toFixed(3));
     });
   }
   function onScroll() {
@@ -5719,11 +5759,12 @@ var e="script#wp-emoji-settings",t=document.querySelector(e);if(!(t instanceof H
   }
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', measure);
-  mobile.addEventListener('change', measure);
-  if ('ResizeObserver' in window) {            // ảnh phía trên tải xong / mở-đóng accordion Quy trình / chữ xuống dòng khác
+  reduce.addEventListener('change', measure);
+  rails.forEach(function (r) { r.mq.addEventListener('change', measure); });
+  if ('ResizeObserver' in window) {            // ảnh phía trên tải xong / mở-đóng accordion / chữ xuống dòng khác
     var ro = new ResizeObserver(measure);
     ro.observe(document.body);
-    if (hasRail) ro.observe(tl);
+    rails.forEach(function (r) { ro.observe(r.tl); });
   }
   measure();
 })();

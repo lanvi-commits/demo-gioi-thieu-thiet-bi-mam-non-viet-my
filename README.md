@@ -1,6 +1,6 @@
 # Demo hiệu ứng: trang Giới thiệu Thiết bị mầm non Việt Mỹ
 
-Bản chụp nguyên trang https://website-demo-02.thcmedia.vn/gioi-thieu/ (ngày 21/10/2026). **Không đổi nội dung hay thứ tự section nào.** Demo phủ thêm 6 hiệu ứng, thu gọn khoảng cách giữa các section, chỉnh cỡ chữ theo tab "Size chữ", làm gọn hero, thêm hiệu ứng cho 3 khối Tầm nhìn & Sứ mệnh, Hành trình phát triển, Giá trị cốt lõi, và cho Quy trình tư vấn hiện/ẩn theo chiều cuộn.
+Bản chụp nguyên trang https://website-demo-02.thcmedia.vn/gioi-thieu/ (ngày 21/10/2026). **Không đổi nội dung hay thứ tự section nào.** Demo phủ thêm 6 hiệu ứng, thu gọn khoảng cách giữa các section, chỉnh cỡ chữ theo tab "Size chữ", làm gọn hero, thêm hiệu ứng cho 3 khối Tầm nhìn & Sứ mệnh, Hành trình phát triển, Giá trị cốt lõi, và cho Quy trình tư vấn thanh liền với ô số sáng dần theo cuộn.
 
 **Xem demo:** https://lanvi-commits.github.io/demo-gioi-thieu-thiet-bi-mam-non-viet-my/
 
@@ -28,13 +28,13 @@ Trên điện thoại, hiệu ứng hover tự tắt. Máy bật "giảm chuyể
 | Tầm nhìn & Sứ mệnh | 2 thẻ hiện dần và trượt lên 16px, thẻ sau trễ 0,1 giây | Icon nhún lên 4px |
 | Hành trình phát triển, máy tính (≥ 992px) | Thanh đỏ tự vẽ từ trái sang trong 1 giây. Mốc nào được thanh chạm tới thì bật ra, chữ dưới mốc trượt lên theo. Mốc cuối ("Hiện tại") toả 2 vòng sóng rồi dừng | Icon nhún lên 4px |
 | Hành trình phát triển, tablet (768–991px) | Site ẩn thanh đỏ ở khổ này, nên từng mốc hiện dần khi cuộn tới | – |
-| Hành trình phát triển, mobile (≤ 767px) | Mốc xếp dọc, icon nằm bên trái. **Thanh đỏ dọc và các ô mốc chạy cùng nhau theo vị trí cuộn.** Cuộn xuống: thanh dài ra, ô nào sắp được thanh chạm tới thì rõ dần và trượt lên, thanh chạm icon là ô hiện đủ (lúc icon lên tới 60% chiều cao màn hình). Cuộn lên: thanh rút lại, ô phía dưới mờ dần theo. Thanh chạy hết thì mốc cuối toả 2 vòng sóng | – |
+| Hành trình phát triển, mobile (≤ 767px) | Mốc xếp dọc, icon nằm bên trái, chữ đứng yên. **Thanh đỏ dọc dài ra khi cuộn xuống, ngắn lại khi cuộn lên.** Icon chưa tới thì tắt (nền trắng, icon xám nhạt); thanh chạm tới thì sáng dần thành tròn đỏ như site, icon đang đứng có quầng mờ; thanh rút lên qua thì tắt lại. Thanh chạy hết thì mốc cuối toả 2 vòng sóng | – |
 | Giá trị cốt lõi | 5 thẻ hiện dần và trượt lên 16px, các thẻ cùng hàng lệch nhau 0,08 giây | **Cả thẻ nhún lên 4px** kèm bóng nhẹ, viền chuyển đỏ nhạt (bóng và viền lấy đúng hover thẻ Đối tác), icon nhún thêm 4px |
 
 - Tiêu đề H2 của 3 khối giữ nguyên, không có hiệu ứng, giống các section khác.
 - Tầm nhìn và Hành trình không nhấc cả thẻ khi rê chuột, vì các thẻ này không bấm được, nhấc lên kèm bóng dễ khiến khách tưởng là link. Riêng Giá trị cốt lõi nhấc cả thẻ theo yêu cầu.
 - Thẻ Giá trị cốt lõi dùng thuộc tính `translate` cho hiệu ứng hiện dần và `transform` cho nhún khi hover. Hai thuộc tính độc lập nên thẻ nhún ngay khi rê chuột. Nếu dùng chung `transform`, thẻ phải chờ hết nhịp trễ của hiệu ứng hiện dần (tới 0,32 giây) và nhún chậm 0,6 giây.
-- Máy bật "giảm chuyển động": thẻ chỉ hiện dần (0,3 giây), không trượt, không vẽ thanh, không có sóng, icon không nhún. Trên mobile, thanh dọc hiện đủ ngay và không có sóng; các ô mốc vẫn rõ/mờ theo cuộn nhưng không trượt.
+- Máy bật "giảm chuyển động": thẻ chỉ hiện dần (0,3 giây), không trượt, không vẽ thanh, không có sóng, icon không nhún. Thanh dọc (Hành trình mobile, Quy trình) hiện đủ ngay, mọi ô sáng sẵn, không có sóng.
 - **Đổi bố cục Hành trình trên mobile (≤ 767px):** site hiện xếp mốc thành cột, chữ căn giữa ngay dưới icon, nên một thanh dọc chạy giữa sẽ đè lên chữ. Vì vậy demo đổi sang kiểu trục trái, giống khối Quy trình cùng trang: icon nằm trái, chữ căn trái bên phải, thanh chạy qua tâm các icon. Tablet (768–991px) giữ bố cục lưới 2 cột như site.
 - Nội dung chỉ bị ẩn khi JS đã chạy. Nếu JS lỗi, cả 3 khối vẫn hiện bình thường như site hiện tại. Thẻ được ẩn bằng `opacity`, nên Google và trình đọc màn hình vẫn đọc đủ chữ.
 
@@ -46,19 +46,20 @@ Trên điện thoại, hiệu ứng hover tự tắt. Máy bật "giảm chuyể
 
 **Lỗi có sẵn trên site (demo chưa sửa):** từ 991px trở xuống, 2 thẻ Tầm nhìn/Sứ mệnh chỉ cao 50px và **toàn bộ chữ trong thẻ bị cắt mất**, chỉ còn thấy icon (đo cả trên site thật ở 820px và 390px). Nguyên nhân: ở khổ này theme đổi `.cards` sang cột, nhưng `.card` vẫn giữ `flex: 1 1 0` cùng `overflow: hidden`. Kích thước tối thiểu của thẻ vì thế về 0, và thẻ co lại chỉ còn phần đệm. Cách sửa: thêm `.about_vision_mission .card { flex: 0 0 auto }` trong `@media (max-width: 991.98px)`.
 
-## Quy trình tư vấn: hiện dần khi cuộn xuống, ẩn dần khi cuộn lên
+## Quy trình tư vấn: thanh liền + ô số sáng dần theo cuộn (theo video mẫu)
 
-Áp cho cả desktop và mobile. Ở site hiện tại, khối này đứng yên.
+Áp cho cả desktop và mobile. Ở site hiện tại, khối này đứng yên, giữa các số chỉ có những đoạn nối mờ rời nhau.
 
-- Hiệu ứng **chạy theo vị trí cuộn**: mỗi bước (số thứ tự, đoạn nối và thẻ) đang ở đáy màn hình thì ẩn, đi lên tới 3/4 chiều cao màn hình thì hiện đủ. Ở giữa 2 mức đó, bước rõ dần và trượt lên dần (tối đa 24px).
-- Cuộn xuống: các bước lần lượt rõ dần. Cuộn lên: bước nào trôi xuống dải 1/4 cuối màn hình thì mờ dần và trượt xuống, ngay trong vùng nhìn thấy. Dừng cuộn ở đâu thì bước đứng yên ở mức đó.
-- Máy bật "giảm chuyển động" thì chỉ rõ/mờ theo cuộn, không trượt.
-- Bản trước (v7) chỉ ẩn bước khi nó đã trôi xuống 10% cuối màn hình, tức là lúc sắp khuất, nên khi cuộn lên gần như không thấy gì. Bản này sửa đúng chỗ đó.
-- Accordion mở/đóng giữ như site, không đụng tới.
+- **Thẻ nội dung đứng yên**, không mờ, không trượt.
+- Một **thanh đỏ liền** chạy qua tâm các số 1 → 5, thay cho các đoạn nối rời. Cuộn xuống thì thanh dài ra, cuộn lên thì ngắn lại. Đầu thanh nằm ở vạch 60% chiều cao màn hình.
+- **Ô số** chưa được thanh chạm tới thì để viền rỗng như site. Thanh chạm tới thì ô chuyển dần (0,4 giây) sang tô đỏ đầy, số màu trắng. Ô đang đứng (ô cuối cùng thanh đã chạm) có thêm quầng mờ quanh. Thanh rút lên qua ô nào thì ô đó trở lại viền rỗng.
+- Site đang tô đầy số của **bước đang mở accordion**. Ở demo, màu số do vị trí cuộn quyết định, nên bỏ kiểu tô đó. Thẻ đang mở vẫn giữ viền đỏ như site.
+- Máy bật "giảm chuyển động": thanh hiện đủ, mọi ô sáng sẵn, không chuyển màu dần.
+- Hai bản trước (v7, v8) làm mờ và trượt cả thẻ theo cuộn. Bản này bỏ hẳn kiểu đó và làm theo video mẫu.
 
-**Cho DEV:** CSS ở mục 13 trong khối `<style id="vmx-fx">`. JS dùng chung file `vmx-fx-cuon` với 3 khối trên, phần "THEO VỊ TRÍ CUỘN" ở cuối file: mỗi khung cuộn JS đặt biến `--vmx-p` (0 tới 1) lên từng bước Quy trình và từng ô mốc Hành trình mobile, cùng `--vmx-rail-p` cho thanh dọc. CSS chỉ đọc biến để vẽ, **không có transition**, vì có transition thì hiệu ứng sẽ trễ sau tay cuộn. Hành trình mobile nằm ở mục 11b (CSS). Vị trí được đo lại khi bố cục đổi (ảnh tải xong, mở/đóng accordion).
+**Cho DEV:** CSS ở mục 13 (Quy trình) và 11b (Hành trình mobile) trong khối `<style id="vmx-fx">`. JS ở phần "THEO VỊ TRÍ CUỘN" cuối khối `<script id="vmx-fx-cuon">`, dùng chung cho 2 thanh. Mỗi khung cuộn, JS đặt `--vmx-rail-p` (0 tới 1) lên `.timeline` để CSS vẽ thanh bằng `scaleY`, và gắn `.vmx-reached` / `.vmx-current` lên `.item` khi có ô đổi trạng thái. Nền đỏ của ô là gradient, không chuyển dần được, nên được vẽ ở lớp `::before` và chỉ đổi `opacity`. Vị trí được đo lại khi bố cục đổi (ảnh tải xong, mở/đóng accordion, xoay màn hình). Các đoạn `.line` của theme được ẩn bằng `visibility: hidden` để giữ nguyên chiều cao bố cục.
 
-**Bẫy đo vị trí (thanh dọc mobile):** các mốc đang ẩn có `transform`, nên Chrome lấy chính `.item` làm `offsetParent` của icon. Nếu tính bằng `list.offsetTop + marker.offsetTop` thì mọi icon đo ra 0 và thanh dài 0px. Cách đúng là cộng dồn `offsetTop` ngược lên tới `.timeline`. Không dùng `getBoundingClientRect` vì kết quả lệch theo đoạn trượt 16px.
+**Bẫy đo vị trí:** các mốc đang ẩn có `transform`, nên Chrome lấy chính `.item` làm `offsetParent` của icon. Nếu tính bằng `list.offsetTop + marker.offsetTop` thì mọi icon đo ra 0 và thanh dài 0px. Cách đúng là cộng dồn `offsetTop` ngược lên tới `.timeline`. Không dùng `getBoundingClientRect` cho tâm ô, vì kết quả lệch theo mọi transform đang chạy.
 
 ## Khoảng cách giữa các section (sheet dòng 114)
 
