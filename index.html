@@ -475,6 +475,7 @@ var woocommerce_params = {"ajax_url":"/wp-admin/admin-ajax.php","wc_ajax_url":"/
   --cta-sheen: rgba(255, 255, 255, .32);      /* vệt sáng lướt qua nút đỏ — cùng giá trị demo Liên hệ v2 */
   --cta-focus-ring: #0a1d3b;                  /* navy footer — vòng focus bàn phím */
   --card-hover-border: rgba(215, 16, 16, .35); /* = viền hover thẻ Đối tác của theme (partner_logos .card:hover) */
+  --card-hover-shadow: 0 8px 24px rgba(17, 25, 39, .08); /* = bóng hover thẻ Đối tác, cùng rule trên */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
 }
@@ -642,8 +643,8 @@ html.vmx-fx #about_hero_story .actions { margin-top: var(--vmx-hero-cta); }   /*
    a) Hiện dần khi cuộn tới, 1 lần: thẻ mờ → rõ + trượt lên 16px, 600ms, thẻ cùng lọt màn hình lệch nhau 80–100ms.
       hieu-ung-cuon.js gắn .is-in + --vmx-delay. Tiêu đề H2 đứng yên như mọi section khác.
       Trạng thái ẩn chỉ áp khi có html.vmx-reveal (JS gắn) → JS lỗi thì nội dung vẫn hiện như live.
-   b) Hover: icon nhún lên 4px. KHÔNG nhấc cả thẻ — các thẻ này không bấm được, nhấc thẻ + bóng (kiểu theme làm
-      cho thẻ có link) dễ khiến khách tưởng là link. Thẻ Giá trị cốt lõi thêm viền đỏ nhạt như thẻ Đối tác.
+   b) Hover: icon nhún lên 4px. Tầm nhìn/Hành trình không nhấc cả thẻ (thẻ không bấm được, nhấc + bóng dễ bị tưởng là link).
+      Giá trị cốt lõi (v6, user 21/10: "hover thì thẻ nhún lên"): CẢ THẺ nhún 4px + bóng + viền đỏ nhạt như thẻ Đối tác.
    BẪY: theme có 2 @keyframes cùng tên fadeInUp (style-animations.css trượt 40px · style-header.css kèm
    translateX(-50%)) — bản khai sau thắng → đừng tái dùng tên đó, ở đây chỉ dùng transition.
    --------------------------------------------------------------------- */
@@ -651,13 +652,15 @@ html.vmx-fx #about_hero_story .actions { margin-top: var(--vmx-hero-cta); }   /*
 html.vmx-fx #about_vision_mission .card {
   transition: opacity 600ms var(--ease-out) var(--vmx-delay, 0ms), transform 600ms var(--ease-out) var(--vmx-delay, 0ms);
 }
-/* 12 · Giá trị cốt lõi — 5 thẻ (viền đổi màu khi hover, không trễ theo nhịp hiện dần) */
+/* 12 · Giá trị cốt lõi — 5 thẻ. Hiện dần dùng thuộc tính `translate`, nhún khi hover dùng `transform`: 2 thuộc tính
+   độc lập nên mỗi cái có thời lượng riêng. Dùng chung `transform` thì hover phải chờ trễ nhịp hiện dần (tới 320ms)
+   và chạy 600ms → thẻ nhún lề mề. */
 html.vmx-fx #about_core_values .card {
-  transition: opacity 600ms var(--ease-out) var(--vmx-delay, 0ms), transform 600ms var(--ease-out) var(--vmx-delay, 0ms),
-              border-color .25s ease;
+  transition: opacity 600ms var(--ease-out) var(--vmx-delay, 0ms), translate 600ms var(--ease-out) var(--vmx-delay, 0ms),
+              transform 250ms var(--ease-out), box-shadow .25s ease, border-color .25s ease;
 }
-html.vmx-fx.vmx-reveal #about_vision_mission .card:not(.is-in),
-html.vmx-fx.vmx-reveal #about_core_values .card:not(.is-in) { opacity: 0; transform: translateY(16px); }
+html.vmx-fx.vmx-reveal #about_vision_mission .card:not(.is-in) { opacity: 0; transform: translateY(16px); }
+html.vmx-fx.vmx-reveal #about_core_values .card:not(.is-in) { opacity: 0; translate: 0 16px; }
 
 html.vmx-fx #about_vision_mission .icon,
 html.vmx-fx #about_journey .icon,
@@ -666,7 +669,11 @@ html.vmx-fx #about_core_values .icon { transition: transform 250ms var(--ease-ou
   html.vmx-fx #about_vision_mission .card:hover .icon,
   html.vmx-fx #about_journey .item:hover .icon,
   html.vmx-fx #about_core_values .card:hover .icon { transform: translateY(-4px); }
-  html.vmx-fx #about_core_values .card:hover { border-color: var(--card-hover-border); }
+  html.vmx-fx #about_core_values .card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--card-hover-shadow);
+    border-color: var(--card-hover-border);
+  }
 }
 
 /* 11 · Hành trình phát triển
@@ -716,9 +723,10 @@ html.vmx-fx #about_journey .marker::after {
   html.vmx-fx #about_journey .item,
   html.vmx-fx #about_journey .marker,
   html.vmx-fx #about_journey .copy { transition: opacity 300ms ease; }
-  html.vmx-fx #about_core_values .card { transition: opacity 300ms ease, border-color .25s ease; }
+  html.vmx-fx #about_core_values .card { transition: opacity 300ms ease, box-shadow .25s ease, border-color .25s ease; }
+  html.vmx-fx.vmx-reveal #about_core_values .card:not(.is-in) { translate: none; }
+  html.vmx-fx #about_core_values .card:hover { transform: none; }   /* giữ bóng + viền, bỏ nhún */
   html.vmx-fx.vmx-reveal #about_vision_mission .card:not(.is-in),
-  html.vmx-fx.vmx-reveal #about_core_values .card:not(.is-in),
   html.vmx-fx.vmx-reveal #about_journey .item:not(.is-in),
   html.vmx-fx.vmx-reveal #about_journey .timeline:not(.is-in) .marker,
   html.vmx-fx.vmx-reveal #about_journey .timeline:not(.is-in) .copy { transform: none; }

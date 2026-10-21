@@ -28,10 +28,11 @@ Trên điện thoại, hiệu ứng hover tự tắt. Máy bật "giảm chuyể
 | Tầm nhìn & Sứ mệnh | 2 thẻ hiện dần và trượt lên 16px, thẻ sau trễ 0,1 giây | Icon nhún lên 4px |
 | Hành trình phát triển, máy tính (≥ 992px) | Thanh đỏ tự vẽ từ trái sang trong 1 giây. Mốc nào được thanh chạm tới thì bật ra, chữ dưới mốc trượt lên theo. Mốc cuối ("Hiện tại") toả 2 vòng sóng rồi dừng | Icon nhún lên 4px |
 | Hành trình phát triển, tablet/mobile (≤ 991px) | Site ẩn thanh đỏ ở khổ này, nên từng mốc hiện dần khi cuộn tới | – |
-| Giá trị cốt lõi | 5 thẻ hiện dần và trượt lên 16px, các thẻ cùng hàng lệch nhau 0,08 giây | Icon nhún lên 4px, viền thẻ chuyển đỏ nhạt (cùng màu viền hover của thẻ Đối tác) |
+| Giá trị cốt lõi | 5 thẻ hiện dần và trượt lên 16px, các thẻ cùng hàng lệch nhau 0,08 giây | **Cả thẻ nhún lên 4px** kèm bóng nhẹ, viền chuyển đỏ nhạt (bóng và viền lấy đúng hover thẻ Đối tác), icon nhún thêm 4px |
 
 - Tiêu đề H2 của 3 khối giữ nguyên, không có hiệu ứng, giống các section khác.
-- Không nhấc cả thẻ khi rê chuột. Các thẻ này không bấm được, nếu nhấc lên kèm bóng như thẻ có link thì khách dễ tưởng là link.
+- Tầm nhìn và Hành trình không nhấc cả thẻ khi rê chuột, vì các thẻ này không bấm được, nhấc lên kèm bóng dễ khiến khách tưởng là link. Riêng Giá trị cốt lõi nhấc cả thẻ theo yêu cầu.
+- Thẻ Giá trị cốt lõi dùng thuộc tính `translate` cho hiệu ứng hiện dần và `transform` cho nhún khi hover. Hai thuộc tính độc lập nên thẻ nhún ngay khi rê chuột. Nếu dùng chung `transform`, thẻ phải chờ hết nhịp trễ của hiệu ứng hiện dần (tới 0,32 giây) và nhún chậm 0,6 giây.
 - Máy bật "giảm chuyển động": thẻ chỉ hiện dần (0,3 giây), không trượt, không vẽ thanh, không có sóng, icon không nhún.
 - Nội dung chỉ bị ẩn khi JS đã chạy. Nếu JS lỗi, cả 3 khối vẫn hiện bình thường như site hiện tại. Thẻ được ẩn bằng `opacity`, nên Google và trình đọc màn hình vẫn đọc đủ chữ.
 
