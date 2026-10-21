@@ -474,6 +474,7 @@ var woocommerce_params = {"ajax_url":"/wp-admin/admin-ajax.php","wc_ajax_url":"/
   --cta-secondary-hover-bg: #fdecec;          /* chữ đỏ #d71010 trên nền này: 4,63:1 — đạt AA */
   --cta-sheen: rgba(255, 255, 255, .32);      /* vệt sáng lướt qua nút đỏ — cùng giá trị demo Liên hệ v2 */
   --cta-focus-ring: #0a1d3b;                  /* navy footer — vòng focus bàn phím */
+  --card-hover-border: rgba(215, 16, 16, .35); /* = viền hover thẻ Đối tác của theme (partner_logos .card:hover) */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
 }
@@ -633,6 +634,99 @@ html.vmx-fx #about_hero_story .actions { margin-top: var(--vmx-hero-cta); }   /*
   html.vmx-fx #about_hero_story .btn--primary:hover .chevron,
   html.vmx-fx #about_hero_story .btn--primary:active,
   html.vmx-fx #about_hero_story .btn--secondary:active { transform: none; }
+}
+
+/* ---------------------------------------------------------------------
+   10–12 · TẦM NHÌN & SỨ MỆNH · HÀNH TRÌNH · GIÁ TRỊ CỐT LÕI (user 21/10: "thêm hiệu ứng").
+   Live: cả 3 khối đứng yên, không hover, không transition (đo 21/10, CSS live = bản chụp).
+   a) Hiện dần khi cuộn tới, 1 lần: thẻ mờ → rõ + trượt lên 16px, 600ms, thẻ cùng lọt màn hình lệch nhau 80–100ms.
+      hieu-ung-cuon.js gắn .is-in + --vmx-delay. Tiêu đề H2 đứng yên như mọi section khác.
+      Trạng thái ẩn chỉ áp khi có html.vmx-reveal (JS gắn) → JS lỗi thì nội dung vẫn hiện như live.
+   b) Hover: icon nhún lên 4px. KHÔNG nhấc cả thẻ — các thẻ này không bấm được, nhấc thẻ + bóng (kiểu theme làm
+      cho thẻ có link) dễ khiến khách tưởng là link. Thẻ Giá trị cốt lõi thêm viền đỏ nhạt như thẻ Đối tác.
+   BẪY: theme có 2 @keyframes cùng tên fadeInUp (style-animations.css trượt 40px · style-header.css kèm
+   translateX(-50%)) — bản khai sau thắng → đừng tái dùng tên đó, ở đây chỉ dùng transition.
+   --------------------------------------------------------------------- */
+/* 10 · Tầm nhìn & Sứ mệnh — 2 thẻ đỏ/cam */
+html.vmx-fx #about_vision_mission .card {
+  transition: opacity 600ms var(--ease-out) var(--vmx-delay, 0ms), transform 600ms var(--ease-out) var(--vmx-delay, 0ms);
+}
+/* 12 · Giá trị cốt lõi — 5 thẻ (viền đổi màu khi hover, không trễ theo nhịp hiện dần) */
+html.vmx-fx #about_core_values .card {
+  transition: opacity 600ms var(--ease-out) var(--vmx-delay, 0ms), transform 600ms var(--ease-out) var(--vmx-delay, 0ms),
+              border-color .25s ease;
+}
+html.vmx-fx.vmx-reveal #about_vision_mission .card:not(.is-in),
+html.vmx-fx.vmx-reveal #about_core_values .card:not(.is-in) { opacity: 0; transform: translateY(16px); }
+
+html.vmx-fx #about_vision_mission .icon,
+html.vmx-fx #about_journey .icon,
+html.vmx-fx #about_core_values .icon { transition: transform 250ms var(--ease-out); }
+@media (hover: hover) and (pointer: fine) {
+  html.vmx-fx #about_vision_mission .card:hover .icon,
+  html.vmx-fx #about_journey .item:hover .icon,
+  html.vmx-fx #about_core_values .card:hover .icon { transform: translateY(-4px); }
+  html.vmx-fx #about_core_values .card:hover { border-color: var(--card-hover-border); }
+}
+
+/* 11 · Hành trình phát triển
+   ≥992: thanh đỏ vẽ đều từ trái sang 1000ms (clip-path — scaleX sẽ nén dải gradient mờ 2 đầu).
+         Mốc bật ra (mờ → rõ, 90% → 100%) đúng lúc thanh chạm tâm mốc: --vmx-at do JS đo, 3 mốc ≈ 100/500/900ms.
+         Chữ dưới mốc trượt lên trễ hơn mốc 100ms. Mốc cuối ("… – Hiện tại") toả 2 vòng sóng rồi dừng hẳn.
+   ≤991: theme ẩn thanh, mốc xếp lưới/dọc → từng mốc hiện dần như thẻ ở trên. */
+html.vmx-fx #about_journey .marker { position: relative; }
+html.vmx-fx #about_journey .marker::after {
+  content: ""; position: absolute; inset: 0; border-radius: 50%; pointer-events: none;
+  border: 2px solid var(--primary_color, #d71010); opacity: 0;
+}
+@keyframes vmx-journey-ripple {
+  0%   { opacity: .45; transform: scale(1); }
+  100% { opacity: 0;   transform: scale(1.7); }
+}
+@media (min-width: 992px) {
+  /* trạng thái hiện phải khai inset(0 …) — từ inset() sang `none` (mặc định) trình duyệt không nội suy, thanh nhảy cái một */
+  html.vmx-fx #about_journey .timeline::before { clip-path: inset(0 0 0 0); transition: clip-path 1000ms linear; }
+  html.vmx-fx #about_journey .marker {
+    transition: opacity 400ms var(--ease-out) var(--vmx-at, 0ms), transform 400ms var(--ease-out) var(--vmx-at, 0ms);
+  }
+  html.vmx-fx #about_journey .copy {
+    transition: opacity 500ms var(--ease-out) calc(var(--vmx-at, 0ms) + 100ms),
+                transform 500ms var(--ease-out) calc(var(--vmx-at, 0ms) + 100ms);
+  }
+  html.vmx-fx.vmx-reveal #about_journey .timeline:not(.is-in)::before { clip-path: inset(0 100% 0 0); }
+  html.vmx-fx.vmx-reveal #about_journey .timeline:not(.is-in) .marker { opacity: 0; transform: scale(.9); }
+  html.vmx-fx.vmx-reveal #about_journey .timeline:not(.is-in) .copy { opacity: 0; transform: translateY(12px); }
+  html.vmx-fx.vmx-reveal #about_journey .timeline.is-in .item:last-child .marker::after {
+    animation: vmx-journey-ripple 1200ms var(--ease-out) calc(var(--vmx-at, 0ms) + 400ms) 2;
+  }
+}
+@media (max-width: 991.98px) {
+  html.vmx-fx #about_journey .item {
+    transition: opacity 600ms var(--ease-out) var(--vmx-delay, 0ms), transform 600ms var(--ease-out) var(--vmx-delay, 0ms);
+  }
+  html.vmx-fx.vmx-reveal #about_journey .item:not(.is-in) { opacity: 0; transform: translateY(16px); }
+  html.vmx-fx.vmx-reveal #about_journey .item.is-in:last-child .marker::after {
+    animation: vmx-journey-ripple 1200ms var(--ease-out) calc(var(--vmx-delay, 0ms) + 600ms) 2;
+  }
+}
+
+/* Giảm chuyển động: chỉ còn mờ → rõ (300ms), không trượt, không vẽ thanh, không sóng, icon không nhún */
+@media (prefers-reduced-motion: reduce) {
+  html.vmx-fx #about_vision_mission .card,
+  html.vmx-fx #about_journey .item,
+  html.vmx-fx #about_journey .marker,
+  html.vmx-fx #about_journey .copy { transition: opacity 300ms ease; }
+  html.vmx-fx #about_core_values .card { transition: opacity 300ms ease, border-color .25s ease; }
+  html.vmx-fx.vmx-reveal #about_vision_mission .card:not(.is-in),
+  html.vmx-fx.vmx-reveal #about_core_values .card:not(.is-in),
+  html.vmx-fx.vmx-reveal #about_journey .item:not(.is-in),
+  html.vmx-fx.vmx-reveal #about_journey .timeline:not(.is-in) .marker,
+  html.vmx-fx.vmx-reveal #about_journey .timeline:not(.is-in) .copy { transform: none; }
+  html.vmx-fx.vmx-reveal #about_journey .timeline:not(.is-in)::before { clip-path: none; }
+  html.vmx-fx #about_journey .marker::after { animation: none !important; }
+  html.vmx-fx #about_vision_mission .card:hover .icon,
+  html.vmx-fx #about_journey .item:hover .icon,
+  html.vmx-fx #about_core_values .card:hover .icon { transform: none; }
 }
 
 /* =====================================================================
@@ -5386,6 +5480,92 @@ var e="script#wp-emoji-settings",t=document.querySelector(e);if(!(t instanceof H
     var el = e.target;
     if (el.name in RULES && el.value && el.closest('#consult-dialog')) check(el);
   });
+})();
+</script>
+<script id="vmx-fx-cuon">
+/* 10–12 · HIỆN DẦN KHI CUỘN TỚI — Tầm nhìn & Sứ mệnh · Hành trình phát triển · Giá trị cốt lõi (user 21/10: "thêm hiệu ứng").
+   File này chỉ gắn class `is-in` (1 lần) lên phần tử khi nó lọt vào màn hình. Chuyển động nằm hết trong CSS (hieu-ung.css mục 10–12).
+
+   DEV chép sang theme: chép nguyên file, nạp ở footer (sau nội dung). Không phụ thuộc thư viện nào.
+     - Không có IntersectionObserver (trình duyệt rất cũ) → không gắn html.vmx-reveal → nội dung hiện sẵn như hiện tại.
+     - JS lỗi / chưa tải xong → cũng không có html.vmx-reveal → không bao giờ kẹt nội dung ở trạng thái ẩn.
+     - Ẩn bằng opacity, không display/visibility → máy đọc màn hình và Google vẫn đọc đủ chữ.
+
+   Hành trình có 2 kiểu, CSS tự chọn theo khổ:
+     ≥992px  cả dải mốc là 1 khối (.timeline): thanh đỏ vẽ từ trái sang, mốc bật ra khi thanh chạm tới
+     ≤991px  thanh đỏ bị theme ẩn, mốc xếp dọc → từng mốc (.item) hiện khi cuộn tới
+   → quan sát cả .timeline lẫn từng .item; CSS mỗi khổ chỉ dùng 1 trong 2. */
+(function () {
+  'use strict';
+  if (!('IntersectionObserver' in window)) return;
+
+  // Phần tử hiện dần + khoảng lệch (ms) giữa các phần tử cùng lọt vào màn hình trong 1 lần
+  var GROUPS = [
+    { sel: '#about_vision_mission .card', step: 100 },
+    { sel: '#about_journey .item', step: 100 },
+    { sel: '#about_core_values .card', step: 80 }
+  ];
+  var UNITS = ['#about_journey .timeline'];          // khối hiện 1 lần, nhịp lệch nằm sẵn trong CSS
+
+  var stepOf = new Map();
+  var targets = [];
+  GROUPS.forEach(function (g) {
+    document.querySelectorAll(g.sel).forEach(function (el) {
+      el.setAttribute('data-vmx-reveal', '');
+      stepOf.set(el, g.step);
+      targets.push(el);
+    });
+  });
+  UNITS.forEach(function (sel) {
+    document.querySelectorAll(sel).forEach(function (el) { targets.push(el); });
+  });
+  if (!targets.length) return;
+
+  // Gắn SAU khi đã đánh dấu phần tử → chỉ lúc này CSS mới ẩn chúng
+  document.documentElement.classList.add('vmx-reveal');
+
+  // ≥992: mỗi mốc bật ra đúng lúc thanh đỏ (vẽ đều từ trái sang) chạm tới tâm mốc → đo vị trí thật thay vì
+  // ghi cứng 3 nhịp, vì số mốc còn đổi (sheet: "Hành trình… nhập liệu chưa đúng"). Thời lượng đọc từ CSS.
+  function syncTimeline(tl) {
+    var line = getComputedStyle(tl, '::before');
+    if (line.display === 'none') return;               // ≤991: theme ẩn thanh, mốc hiện theo từng .item
+    var dur = parseFloat(line.transitionDuration) * 1000;
+    var r = tl.getBoundingClientRect();
+    var x0 = r.left + parseFloat(line.left);
+    var x1 = r.right - parseFloat(line.right);
+    tl.querySelectorAll('.item').forEach(function (item) {
+      var m = item.querySelector('.marker');
+      if (!m || !(x1 > x0)) return;
+      var mr = m.getBoundingClientRect();
+      var f = Math.min(1, Math.max(0, (mr.left + mr.width / 2 - x0) / (x1 - x0)));
+      var at = Math.round(f * (dur || 0)) + 'ms';
+      [m, item.querySelector('.copy')].forEach(function (el) { if (el) el.style.setProperty('--vmx-at', at); });
+    });
+  }
+
+  function reveal(entries, io) {
+    var batch = entries
+      .filter(function (e) { return e.isIntersecting; })
+      .map(function (e) { return e.target; })
+      .sort(function (a, b) {                          // lệch nhịp theo đúng thứ tự đọc
+        return a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1;
+      });
+    var k = 0;
+    batch.forEach(function (el) {
+      var step = stepOf.get(el);
+      if (step) el.style.setProperty('--vmx-delay', (k++ * step) + 'ms');
+      if (el.classList.contains('timeline')) syncTimeline(el);
+      el.classList.add('is-in');
+      io.unobserve(el);                                // chạy 1 lần, cuộn ngược lên không diễn lại
+    });
+  }
+
+  // Thẻ: hiện khi vừa nhô lên khỏi đáy màn hình (chừa 10% đáy).
+  // Dải mốc Hành trình: diễn tiến 1,4s nên đợi nó lên quá 1/4 dưới màn hình và lộ nửa khối, không thì thanh đã
+  // vẽ xong lúc khối còn nằm sát mép dưới, người xem chưa kịp nhìn tới.
+  var ioCard = new IntersectionObserver(reveal, { rootMargin: '0px 0px -10% 0px', threshold: 0.15 });
+  var ioUnit = new IntersectionObserver(reveal, { rootMargin: '0px 0px -25% 0px', threshold: 0.5 });
+  targets.forEach(function (el) { (stepOf.has(el) ? ioCard : ioUnit).observe(el); });
 })();
 </script>
 <script id="vmx-fx-js">

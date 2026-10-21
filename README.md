@@ -1,10 +1,10 @@
 # Demo hiệu ứng: trang Giới thiệu Thiết bị mầm non Việt Mỹ
 
-Bản chụp nguyên trang https://website-demo-02.thcmedia.vn/gioi-thieu/ (ngày 21/10/2026). **Không đổi nội dung hay thứ tự section nào.** Demo phủ thêm 6 hiệu ứng, thu gọn khoảng cách giữa các section, chỉnh cỡ chữ theo tab "Size chữ" và làm gọn hero.
+Bản chụp nguyên trang https://website-demo-02.thcmedia.vn/gioi-thieu/ (ngày 21/10/2026). **Không đổi nội dung hay thứ tự section nào.** Demo phủ thêm 6 hiệu ứng, thu gọn khoảng cách giữa các section, chỉnh cỡ chữ theo tab "Size chữ", làm gọn hero và thêm hiệu ứng cho 3 khối Tầm nhìn & Sứ mệnh, Hành trình phát triển, Giá trị cốt lõi.
 
 **Xem demo:** https://lanvi-commits.github.io/demo-gioi-thieu-thiet-bi-mam-non-viet-my/
 
-Công tắc ở góc dưới trái dùng để bật/tắt bản đề xuất (hiệu ứng, khoảng cách, cỡ chữ, hero) và so trực tiếp với live. Link có `?fx=0` mở thẳng chế độ Tắt (giống site hiện tại).
+Công tắc ở góc dưới trái dùng để bật/tắt bản đề xuất (hiệu ứng, khoảng cách, cỡ chữ, hero, hiệu ứng 3 khối) và so trực tiếp với live. Link có `?fx=0` mở thẳng chế độ Tắt (giống site hiện tại).
 
 ## 6 hiệu ứng thêm (theo tab "Review tổng thể website")
 
@@ -18,6 +18,30 @@ Công tắc ở góc dưới trái dùng để bật/tắt bản đề xuất (h
 | 6 | Slide Đối tác | Nhảy từng ô mỗi 3,5 giây | Trôi đều liên tục, dừng khi rê chuột hoặc khi popover đang mở | 62 |
 
 Trên điện thoại, hiệu ứng hover tự tắt. Máy bật "giảm chuyển động" thì không zoom và slide đứng yên.
+
+## Hiệu ứng 3 khối Tầm nhìn & Sứ mệnh · Hành trình phát triển · Giá trị cốt lõi
+
+Ở site hiện tại, cả 3 khối đều đứng yên: không có hover, không có hiệu ứng khi cuộn tới.
+
+| Khối | Khi cuộn tới (chạy 1 lần) | Khi rê chuột (máy tính) |
+|---|---|---|
+| Tầm nhìn & Sứ mệnh | 2 thẻ hiện dần và trượt lên 16px, thẻ sau trễ 0,1 giây | Icon nhún lên 4px |
+| Hành trình phát triển, máy tính (≥ 992px) | Thanh đỏ tự vẽ từ trái sang trong 1 giây. Mốc nào được thanh chạm tới thì bật ra, chữ dưới mốc trượt lên theo. Mốc cuối ("Hiện tại") toả 2 vòng sóng rồi dừng | Icon nhún lên 4px |
+| Hành trình phát triển, tablet/mobile (≤ 991px) | Site ẩn thanh đỏ ở khổ này, nên từng mốc hiện dần khi cuộn tới | – |
+| Giá trị cốt lõi | 5 thẻ hiện dần và trượt lên 16px, các thẻ cùng hàng lệch nhau 0,08 giây | Icon nhún lên 4px, viền thẻ chuyển đỏ nhạt (cùng màu viền hover của thẻ Đối tác) |
+
+- Tiêu đề H2 của 3 khối giữ nguyên, không có hiệu ứng, giống các section khác.
+- Không nhấc cả thẻ khi rê chuột. Các thẻ này không bấm được, nếu nhấc lên kèm bóng như thẻ có link thì khách dễ tưởng là link.
+- Máy bật "giảm chuyển động": thẻ chỉ hiện dần (0,3 giây), không trượt, không vẽ thanh, không có sóng, icon không nhún.
+- Nội dung chỉ bị ẩn khi JS đã chạy. Nếu JS lỗi, cả 3 khối vẫn hiện bình thường như site hiện tại. Thẻ được ẩn bằng `opacity`, nên Google và trình đọc màn hình vẫn đọc đủ chữ.
+
+**Cho DEV:**
+- CSS nằm ở mục 10–12 trong khối `<style id="vmx-fx">`. JS nằm trong khối `<script id="vmx-fx-cuon">`: chép nguyên file, nạp ở footer, không cần thư viện. JS chỉ gắn class `is-in` khi phần tử lọt vào màn hình; toàn bộ chuyển động nằm trong CSS.
+- Thời điểm từng mốc Hành trình bật ra được **đo theo vị trí thật** của mốc trên thanh, không ghi cứng 3 nhịp. Nhờ vậy khi nhập lại số mốc (sheet đang ghi "Hành trình… nhập liệu chưa đúng"), hiệu ứng vẫn khớp.
+- **Bẫy 1:** thanh đỏ (`.timeline::before`) phải khai trạng thái hiện là `clip-path: inset(0 0 0 0)`. Nếu để mặc định `none`, trình duyệt không chuyển mượt được từ `inset()` sang `none` và thanh hiện ra một lần, không vẽ dần.
+- **Bẫy 2:** theme có 2 `@keyframes` cùng tên `fadeInUp` (`style-animations.css` trượt 40px; `style-header.css` kèm `translateX(-50%)`). Bản khai sau thắng, nên đừng dùng lại tên này cho hiệu ứng hiện dần.
+
+**Lỗi có sẵn trên site (demo chưa sửa):** từ 991px trở xuống, 2 thẻ Tầm nhìn/Sứ mệnh chỉ cao 50px và **toàn bộ chữ trong thẻ bị cắt mất**, chỉ còn thấy icon (đo cả trên site thật ở 820px và 390px). Nguyên nhân: ở khổ này theme đổi `.cards` sang cột, nhưng `.card` vẫn giữ `flex: 1 1 0` cùng `overflow: hidden`. Kích thước tối thiểu của thẻ vì thế về 0, và thẻ co lại chỉ còn phần đệm. Cách sửa: thêm `.about_vision_mission .card { flex: 0 0 auto }` trong `@media (max-width: 991.98px)`.
 
 ## Khoảng cách giữa các section (sheet dòng 114)
 
