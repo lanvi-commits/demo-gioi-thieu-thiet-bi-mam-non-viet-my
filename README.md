@@ -78,13 +78,14 @@ Demo làm theo mẫu thẻ luật sư user gửi:
 - Rê chuột lên thẻ thì một lớp navy phủ kín thẻ (cùng màu bong bóng cũ, độ phủ 62%), ảnh phía sau nhoè nhẹ 2px nên vẫn nhận ra đồ chơi. Bản v14 dùng độ phủ 88% và nhoè 6px. User thấy tối quá ("sáng xíu để có thể thấy nền bên dưới") nên v16 hạ xuống. Tên nhóm ẩn, đoạn mô tả hiện ở giữa thẻ, bên dưới là chữ "Xem thêm →". Lớp phủ mờ dần vào trong 0,3 giây, chữ trượt lên 8px.
 - Áp cho cả 11 thẻ, bỏ bong bóng cũ.
 - Cả thẻ vẫn là 1 link sang trang danh mục. "Xem thêm" chỉ là chữ gợi ý, không phải link thứ hai.
-- Chỉ chạy trên máy có chuột. Trên điện thoại và tablet cảm ứng, thẻ giữ như site: chạm vào là sang trang danh mục, không phải chạm 2 lần. Dùng phím Tab tới thẻ thì mô tả cũng hiện.
+- Máy có chuột: rê chuột là hiện, bấm 1 lần là vào trang danh mục. Dùng phím Tab tới thẻ thì mô tả cũng hiện, Enter là vào trang.
+- **Điện thoại và tablet cảm ứng (v17):** chạm lần 1 thì mô tả hiện, chạm lần 2 vào cùng thẻ mới sang trang danh mục. Chạm thẻ khác thì thẻ cũ đóng và thẻ mới mở. Chạm ra ngoài, hoặc bấm mũi tên hay chấm của slider, thì thẻ đóng. Vuốt slider không làm mở thẻ. Trong lúc thẻ đang mở, slider mobile dừng tự chạy, nên thẻ không bị cuốn đi. v14–v16 cảm ứng giữ như site (chạm là vào trang ngay). User chọn kiểu chạm 2 lần trong 3 cách (chạm 2 lần · nút ⓘ góc thẻ · mô tả hiện sẵn dưới tên nhóm). Cái giá: trên mobile, khách phải chạm 2 lần mới vào được danh mục.
 - Chữ trắng trên lớp navy 62% đạt tương phản khoảng 4,95:1 ở trường hợp xấu nhất (phía sau là nền trắng), vẫn qua chuẩn AA 4,5:1. Đã thử hạ xuống 52% nhưng chữ khó đọc trên ảnh nhiều màu. Lớp phủ dùng `position: absolute` và chỉ đổi `opacity`, nên không làm trang xê dịch (không ảnh hưởng CLS).
 - Trình đọc màn hình: lớp phủ có `aria-hidden`, còn link trỏ `aria-describedby` vào nó. Tên link vẫn là tên nhóm, mô tả được đọc thành phần mô tả, không bị đọc 2 lần.
 
 **Nội dung mô tả là bản mẫu, cần khách duyệt.** Site chỉ có mô tả danh mục cho Đồ chơi vận động, nên câu của thẻ này lấy đúng từ mô tả đó. 10 nhóm còn lại chưa có mô tả, nên câu được ghép từ các danh mục con đang hiện trên trang danh mục của từng nhóm (đọc ngày 22/10), không thêm số liệu hay chứng nhận nào. Hai nhóm Thông tư 02 và Thông tư 32 viết theo đúng tên danh mục của thông tư.
 
-**Cho DEV:** CSS ở mục 14 trong khối `<style id="vmx-fx">`. Trong theme, chèn vào cuối thẻ `<a class="card">` của component `shop_category_groups`:
+**Cho DEV:** CSS ở mục 14 trong khối `<style id="vmx-fx">`. JS cho cảm ứng ở khối `<script id="vmx-fx-nhom">` (khoảng 30 dòng, chép nguyên khối, bỏ điều kiện `html.vmx-fx`). JS nhận cảm ứng theo loại thao tác của lần chạm (`pointerType`), không theo khổ màn hình. Vì vậy laptop màn cảm ứng vẫn rê chuột như thường, chạm bằng tay mới đi theo luồng chạm 2 lần. Slider mobile bị `splide-autoplay.js` ép tự chạy, nên JS focus vào thẻ đang mở để Splide tạm dừng (tuỳ chọn `pauseOnFocus` mặc định bật). Trong theme, chèn vào cuối thẻ `<a class="card">` của component `shop_category_groups`:
 
 ```html
 <span class="vmx-scg-ov" id="…" aria-hidden="true">

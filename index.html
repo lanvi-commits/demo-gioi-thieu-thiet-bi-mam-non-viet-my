@@ -825,8 +825,9 @@ html.vmx-fx #about_process .timeline.vmx-rail-on .item:not(:first-child):not(.vm
    dính đỉnh che nửa trên, chữ bị cắt giữa từ ("…những năm th…"). Demo: bỏ bong bóng, mô tả nằm TRONG thẻ, đủ 11 nhóm.
    - Lớp phủ = <span class="vmx-scg-ov"> do build.py chèn vào cuối <a class="card"> (nội dung: SCG_DESC trong build.py).
      Cả thẻ vẫn là 1 link; "Xem thêm" chỉ là chữ gợi ý, không phải link thứ 2.
-   - Chỉ máy có chuột. Điện thoại/tablet cảm ứng: chạm là vào trang danh mục như live (không bắt chạm 2 lần).
-     Bàn phím: Tab tới thẻ (:focus-visible) cũng hiện.
+   - Máy có chuột: hover. Bàn phím: Tab tới thẻ (:focus-visible) cũng hiện.
+   - Cảm ứng (v17, user 22/10: "ở mobile tôi thấy không hoạt động" → chọn "chạm 1 lần hiện mô tả"): chạm lần 1 →
+     hieu-ung-nhom.js gắn .vmx-scg-open (chặn mở link), chạm lần 2 → vào trang danh mục. v14–v16 cảm ứng giữ như live.
    - v16 (user 22/10: "sáng xíu để có thể thấy nền bên dưới"): phủ 88% → 62%, nhoè 6px → 2px. Chụp thử 88/72/62/52%:
      52% chữ khó đọc trên ảnh nhiều màu (thẻ TT32) → dừng ở 62%. Chữ trắng, trường hợp xấu nhất (nền trắng dưới lớp phủ)
      ≈ 4,95:1 — vẫn đạt AA 4,5:1 (v14: ≥ 12:1).
@@ -856,10 +857,16 @@ html.vmx-fx #shop_category_groups .vmx-scg-ov__more {
 html.vmx-fx #shop_category_groups .vmx-scg-ov__more i { font-size: 12px; transition: transform .2s var(--ease-out); }
 /* tên nhóm chữ navy nằm ngay dưới "Xem thêm" → qua lớp phủ (88% ở v14, nay 62%) vẫn lộ thành bóng mờ đè chữ (đo v14 nháp) → tắt đi như mẫu */
 html.vmx-fx #shop_category_groups .card .label { transition: opacity .2s ease; }
-html.vmx-fx #shop_category_groups .card:focus-visible .label { opacity: 0; }
-html.vmx-fx #shop_category_groups .card:focus-visible .vmx-scg-ov { opacity: 1; visibility: visible; transition: opacity .3s ease, visibility 0s; }
+html.vmx-fx #shop_category_groups .card:focus-visible .label,
+html.vmx-fx #shop_category_groups .card.vmx-scg-open .label { opacity: 0; }
+html.vmx-fx #shop_category_groups .card:focus-visible .vmx-scg-ov,
+html.vmx-fx #shop_category_groups .card.vmx-scg-open .vmx-scg-ov { opacity: 1; visibility: visible; transition: opacity .3s ease, visibility 0s; }
 html.vmx-fx #shop_category_groups .card:focus-visible .vmx-scg-ov__desc,
-html.vmx-fx #shop_category_groups .card:focus-visible .vmx-scg-ov__more { transform: none; }
+html.vmx-fx #shop_category_groups .card:focus-visible .vmx-scg-ov__more,
+html.vmx-fx #shop_category_groups .card.vmx-scg-open .vmx-scg-ov__desc,
+html.vmx-fx #shop_category_groups .card.vmx-scg-open .vmx-scg-ov__more { transform: none; }
+/* thẻ mở do chạm được focus bằng JS (để slider dừng) → không vẽ vòng focus như khi dùng phím Tab */
+html.vmx-fx #shop_category_groups .card.vmx-scg-open:focus:not(:focus-visible) { outline: none; }
 @media (hover: hover) and (pointer: fine) {
   html.vmx-fx #shop_category_groups .card:hover .label { opacity: 0; }
   html.vmx-fx #shop_category_groups .card:hover .vmx-scg-ov { opacity: 1; visibility: visible; transition: opacity .3s ease, visibility 0s; }
@@ -867,7 +874,7 @@ html.vmx-fx #shop_category_groups .card:focus-visible .vmx-scg-ov__more { transf
   html.vmx-fx #shop_category_groups .card:hover .vmx-scg-ov__more { transform: none; }
   html.vmx-fx #shop_category_groups .card:hover .vmx-scg-ov__more i { transform: translateX(3px); }
 }
-/* ≤767 (cửa sổ máy tính thu hẹp — cảm ứng không có hover): thẻ chỉ còn ~170 × 165px */
+/* ≤767 (điện thoại, chạm để mở — hoặc cửa sổ máy tính thu hẹp): thẻ chỉ còn ~175 × 170px */
 @media (max-width: 767px) {
   html.vmx-fx #shop_category_groups .vmx-scg-ov { gap: 8px; padding: 10px 8px; }
   html.vmx-fx #shop_category_groups .vmx-scg-ov__desc { font-size: 12px; -webkit-line-clamp: 5; }
@@ -5767,6 +5774,55 @@ var e="script#wp-emoji-settings",t=document.querySelector(e);if(!(t instanceof H
       rails.forEach(function (r) { r.live = true; });
     });
   });
+})();
+</script>
+<script id="vmx-fx-nhom">
+/* Mua theo nhóm Thiết bị — trên cảm ứng: CHẠM lần 1 hiện mô tả, chạm lần 2 mới vào trang danh mục
+   (v17, user 22/10 chọn "Chạm 1 lần hiện mô tả" trong 3 cách: chạm 2 lần · nút ⓘ góc thẻ · hiện sẵn dưới tên).
+   Máy có chuột đã có hover ở hieu-ung.css mục 14 — file này chỉ lo cảm ứng. Thẻ mở = class .vmx-scg-open,
+   CSS dùng chung trạng thái với :hover / :focus-visible.
+   - Nhận cảm ứng theo pointerType của LẦN CHẠM, không theo khổ màn hình: laptop màn cảm ứng rê chuột vẫn như thường,
+     chạm bằng tay mới theo luồng chạm. Enter từ bàn phím (click.detail = 0) → vào trang ngay như link thường.
+   - Slider mobile bị theme ép autoplay (components/splide-autoplay.js) → focus vào thẻ đang mở để Splide tạm dừng
+     (pauseOnFocus mặc định bật), không thì thẻ vừa mở bị cuốn sang trang khác. Đóng thẻ → bỏ focus → slider chạy lại.
+   - Kéo slider: Splide tự chặn click sau khi kéo (capture + stopPropagation) → không lọt vào đây, không mở nhầm.
+   - Chạm ra ngoài / chạm thẻ khác / bấm mũi tên, chấm slider / tắt công tắc đề xuất → đóng.
+   DEV chép sang theme: bỏ điều kiện html.vmx-fx. */
+(function () {
+  'use strict';
+  var root = document.documentElement;
+  var sec = document.getElementById('shop_category_groups');
+  if (!sec) return;
+  var lastPointer = '';
+  var open = null;
+
+  function close() {
+    if (!open) return;
+    open.classList.remove('vmx-scg-open');
+    if (document.activeElement === open) open.blur();
+    open = null;
+  }
+
+  // capture: chạy trước Splide và trước mọi handler khác, kể cả khi chạm vào nút mũi tên của slider
+  document.addEventListener('pointerdown', function (e) {
+    lastPointer = e.pointerType;
+    if (open && !open.contains(e.target)) close();
+  }, true);
+
+  sec.addEventListener('click', function (e) {
+    var card = e.target.closest('.card');
+    if (!card || !root.classList.contains('vmx-fx')) return;
+    if (e.detail === 0 || (lastPointer !== 'touch' && lastPointer !== 'pen')) return;  // bàn phím / chuột: link thường
+    if (card === open) return;                                                           // chạm lần 2 → vào trang
+    e.preventDefault();
+    close();
+    open = card;
+    card.classList.add('vmx-scg-open');
+    card.focus({ preventScroll: true });
+  });
+
+  // quay lại bằng nút Back (trang lấy từ bfcache) → thẻ đã chạm lần 2 không còn mở sẵn
+  window.addEventListener('pageshow', function (e) { if (e.persisted) close(); });
 })();
 </script>
 <script id="vmx-fx-js">
