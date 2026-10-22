@@ -741,7 +741,7 @@ html.vmx-fx #about_journey .marker::after {
    13 · QUY TRÌNH TƯ VẤN — THANH LIỀN + Ô SỐ SÁNG DẦN THEO CUỘN (user 21/10, desktop + mobile, theo video mẫu).
    Mẫu: timeline dọc, thẻ ĐỨNG YÊN; thanh dài ra khi cuộn xuống, ngắn lại khi cuộn lên; ô số chưa tới = viền rỗng,
    thanh chạm tới → tô đầy (≈0,4s); ô đang đứng có quầng mờ; thanh rút qua → trở lại rỗng.
-   (v7–v8 làm mờ/trượt cả thẻ — user "không phải" → bỏ.)
+   (v7–v8 làm mờ/trượt cả thẻ — user "không phải" → bỏ. v11 user lại muốn thẻ ẩn/hiện, nhưng BÁM THANH → xem cuối mục.)
    - Thanh liền nối tâm số đầu → tâm số cuối thay cho các đoạn nối rời của theme (.line: ẩn bằng visibility để giữ
      nguyên chiều cao bố cục). ::before = rãnh mờ · ::after = thanh đỏ, scaleY theo --vmx-rail-p (JS mỗi khung cuộn).
    - Ô số: live tô đầy số của bước ĐANG MỞ accordion. Ở đây màu số do vị trí cuộn quyết → bỏ kiểu tô của .is-open
@@ -782,13 +782,26 @@ html.vmx-fx #about_process .item.is-open .num {
 html.vmx-fx #about_process .item.vmx-reached .num { color: #ffffff; }
 html.vmx-fx #about_process .item.vmx-reached .num::before { opacity: 1; }
 html.vmx-fx #about_process .item.vmx-current .num { box-shadow: 0 0 0 6px var(--rail-halo); }
+/* v11 — THẺ HIỆN/ẨN CÙNG THANH (user 22/10: "cả section này ẩn hiện theo cuộn trang luôn, không phải chỉ thanh đỏ").
+   Thẻ bước nào hiện ra đúng lúc thanh chạm ô số bước đó (chung class .vmx-reached), thanh rút lên qua thì ẩn lại.
+   Ô số + rãnh mờ vẫn hiện sẵn làm "đường ray" báo còn bước phía dưới; tiêu đề H2 + mô tả đứng yên như mọi section.
+   Ẩn bằng opacity + translate (không display/visibility) → Google, trình đọc màn hình vẫn đọc đủ chữ.
+   .vmx-rail-on: JS đã chạy → mới được ẩn (JS lỗi thì thẻ hiện như live).
+   .vmx-rail-live: transition bật sau 2 khung → tải trang giữa chừng không chớp. */
+html.vmx-fx #about_process .timeline.vmx-rail-live .card {
+  transition: opacity 500ms var(--ease-out), translate 500ms var(--ease-out);
+}
+html.vmx-fx #about_process .timeline.vmx-rail-on .item:not(.vmx-reached) .card { opacity: 0; translate: 0 24px; }
+/* Tab bàn phím tới nút của thẻ đang ẩn → hiện thẻ đó, không để vòng focus rơi vào chỗ trống */
+html.vmx-fx #about_process .timeline.vmx-rail-on .item:focus-within .card { opacity: 1; translate: none; }
 
 /* Giảm chuyển động: thanh đầy sẵn, mọi ô sáng sẵn (JS cũng coi như đã chạm hết), không chuyển màu dần, không sóng */
 @media (prefers-reduced-motion: reduce) {
   html.vmx-fx #about_journey .timeline::after,
   html.vmx-fx #about_process .timeline::after { transform: none; }
   html.vmx-fx #about_journey .icon, html.vmx-fx #about_journey .icon::before, html.vmx-fx #about_journey .icon-img,
-  html.vmx-fx #about_process .num, html.vmx-fx #about_process .num::before { transition: none; }
+  html.vmx-fx #about_process .num, html.vmx-fx #about_process .num::before,
+  html.vmx-fx #about_process .timeline.vmx-rail-live .card { transition: none; }
 }
 
 /* =====================================================================
@@ -5569,7 +5582,10 @@ var e="script#wp-emoji-settings",t=document.querySelector(e);if(!(t instanceof H
      Ô đổi trạng thái bằng transition CSS 0,4s (như mẫu), chỉ thanh là bám tay cuộn.
      Vị trí tâm ô đo theo toạ độ trang (cộng dồn offsetTop, không tính transform), đo lại khi bố cục đổi
      (ảnh tải, mở/đóng accordion Quy trình, xoay màn hình). Giảm chuyển động: thanh đầy, mọi ô sáng sẵn.
-     (v7–v8 làm mờ/trượt cả thẻ theo cuộn — user: "không phải" + gửi video mẫu → v9 bỏ, thẻ đứng yên.) */
+     (v7–v8 làm mờ/trượt cả thẻ theo cuộn — user: "không phải" + gửi video mẫu → v9 bỏ, thẻ đứng yên.)
+     v11 (user 22/10: "cả section này ẩn hiện theo cuộn trang luôn, không phải chỉ thanh đỏ"): thẻ Quy trình hiện/ẩn
+     theo CÙNG class .vmx-reached với ô số — thanh chạm ô số bước nào thì thẻ bước đó hiện, rút qua thì ẩn. Khác v8 ở
+     chỗ thẻ bám đúng thanh, không tự mờ theo vị trí riêng. JS chỉ gắn .vmx-rail-on / .vmx-rail-live, phần ẩn nằm ở CSS. */
   function docY(el) {
     var y = 0;
     for (; el; el = el.offsetParent) y += el.offsetTop;
@@ -5592,6 +5608,7 @@ var e="script#wp-emoji-settings",t=document.querySelector(e);if(!(t instanceof H
 
   function measure() {
     rails.forEach(function (r) {
+      r.tl.classList.toggle('vmx-rail-on', r.mq.matches);   // CSS chỉ ẩn thẻ Quy trình khi JS đã chạy tới đây
       if (!r.mq.matches) return;
       var base = docY(r.tl);
       r.centers = r.dots.map(function (d) { return docY(d) - base + d.offsetHeight / 2; });   // tâm ô, tính từ đỉnh .timeline
@@ -5637,6 +5654,13 @@ var e="script#wp-emoji-settings",t=document.querySelector(e);if(!(t instanceof H
     rails.forEach(function (r) { ro.observe(r.tl); });
   }
   measure();
+  // Bật transition sau khi trạng thái đầu đã vẽ ra (2 khung): lúc tải trang mà trình duyệt khôi phục vị trí cuộn
+  // ngay giữa Quy trình thì thẻ đứng đúng trạng thái luôn, không chớp hiện rồi mờ dần.
+  requestAnimationFrame(function () {
+    requestAnimationFrame(function () {
+      rails.forEach(function (r) { r.tl.classList.add('vmx-rail-live'); });
+    });
+  });
 })();
 </script>
 <script id="vmx-fx-js">

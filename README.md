@@ -40,18 +40,21 @@ Trên điện thoại, hiệu ứng hover tự tắt. Máy bật "giảm chuyể
 
 **Lỗi có sẵn trên site (demo chưa sửa):** từ 991px trở xuống, 2 thẻ Tầm nhìn/Sứ mệnh chỉ cao 50px và **toàn bộ chữ trong thẻ bị cắt mất**, chỉ còn thấy icon (đo cả trên site thật ở 820px và 390px). Nguyên nhân: ở khổ này theme đổi `.cards` sang cột, nhưng `.card` vẫn giữ `flex: 1 1 0` cùng `overflow: hidden`. Kích thước tối thiểu của thẻ vì thế về 0, và thẻ co lại chỉ còn phần đệm. Cách sửa: thêm `.about_vision_mission .card { flex: 0 0 auto }` trong `@media (max-width: 991.98px)`.
 
-## Quy trình tư vấn: thanh liền + ô số sáng dần theo cuộn (theo video mẫu)
+## Quy trình tư vấn: thanh liền, ô số và thẻ hiện dần theo cuộn
 
 Áp cho cả desktop và mobile. Ở site hiện tại, khối này đứng yên, giữa các số chỉ có những đoạn nối mờ rời nhau.
 
-- **Thẻ nội dung đứng yên**, không mờ, không trượt.
 - Một **thanh đỏ liền** chạy qua tâm các số 1 → 5, thay cho các đoạn nối rời. Cuộn xuống thì thanh dài ra, cuộn lên thì ngắn lại. Đầu thanh nằm ở vạch 60% chiều cao màn hình.
 - **Ô số** chưa được thanh chạm tới thì để viền rỗng như site. Thanh chạm tới thì ô chuyển dần (0,4 giây) sang tô đỏ đầy, số màu trắng. Ô đang đứng (ô cuối cùng thanh đã chạm) có thêm quầng mờ quanh. Thanh rút lên qua ô nào thì ô đó trở lại viền rỗng.
+- **Thẻ của từng bước** (v11, user 22/10: "cả section này ẩn hiện theo cuộn trang luôn, không phải chỉ thanh đỏ") hiện ra cùng lúc thanh chạm ô số của bước đó: mờ sang rõ và trượt lên 24px trong 0,5 giây. Thanh rút lên qua ô số thì thẻ ẩn lại. Thẻ và ô số luôn cùng trạng thái.
+- Các vòng số rỗng và rãnh mờ luôn hiện, làm đường ray báo trước còn bước phía dưới. Tiêu đề H2 và đoạn mô tả của section đứng yên, giống các section khác.
+- Dùng phím Tab tới nút của một thẻ đang ẩn thì thẻ đó hiện ra, vòng focus không rơi vào chỗ trống.
 - Site đang tô đầy số của **bước đang mở accordion**. Ở demo, màu số do vị trí cuộn quyết định, nên bỏ kiểu tô đó. Thẻ đang mở vẫn giữ viền đỏ như site.
-- Máy bật "giảm chuyển động": thanh hiện đủ, mọi ô sáng sẵn, không chuyển màu dần.
-- Hai bản trước (v7, v8) làm mờ và trượt cả thẻ theo cuộn. Bản này bỏ hẳn kiểu đó và làm theo video mẫu.
+- Máy bật "giảm chuyển động": thanh hiện đủ, mọi ô sáng sẵn, mọi thẻ hiện sẵn, không chuyển dần.
+- Thẻ chỉ bị ẩn khi JS đã chạy. Nếu JS lỗi, mọi thẻ vẫn hiện như site. Thẻ được ẩn bằng `opacity`, nên Google và trình đọc màn hình vẫn đọc đủ chữ.
+- Lịch sử: v7, v8 làm thẻ mờ theo vị trí riêng của từng thẻ. v9 cho thẻ đứng yên theo video mẫu. v11 cho thẻ ẩn/hiện bám đúng thanh.
 
-**Cho DEV:** CSS ở mục 13 (Quy trình) và 11b (Hành trình mobile) trong khối `<style id="vmx-fx">`. JS ở phần "THEO VỊ TRÍ CUỘN" cuối khối `<script id="vmx-fx-cuon">`, dùng chung cho 2 thanh. Mỗi khung cuộn, JS đặt `--vmx-rail-p` (0 tới 1) lên `.timeline` để CSS vẽ thanh bằng `scaleY`, và gắn `.vmx-reached` / `.vmx-current` lên `.item` khi có ô đổi trạng thái. Nền đỏ của ô là gradient, không chuyển dần được, nên được vẽ ở lớp `::before` và chỉ đổi `opacity`. Vị trí được đo lại khi bố cục đổi (ảnh tải xong, mở/đóng accordion, xoay màn hình). Các đoạn `.line` của theme được ẩn bằng `visibility: hidden` để giữ nguyên chiều cao bố cục.
+**Cho DEV:** CSS ở mục 13 (Quy trình) và 11b (Hành trình mobile) trong khối `<style id="vmx-fx">`. JS ở phần "THEO VỊ TRÍ CUỘN" cuối khối `<script id="vmx-fx-cuon">`, dùng chung cho 2 thanh. Mỗi khung cuộn, JS đặt `--vmx-rail-p` (0 tới 1) lên `.timeline` để CSS vẽ thanh bằng `scaleY`, và gắn `.vmx-reached` / `.vmx-current` lên `.item` khi có ô đổi trạng thái. Thẻ `.card` dùng chung `.vmx-reached` đó. JS còn gắn `.vmx-rail-on` (chỉ khi có class này thẻ mới được ẩn) và `.vmx-rail-live` sau 2 khung hình (bật transition, để lúc tải lại trang giữa khối thẻ không chớp). Nền đỏ của ô là gradient, không chuyển dần được, nên được vẽ ở lớp `::before` và chỉ đổi `opacity`. Vị trí được đo lại khi bố cục đổi (ảnh tải xong, mở/đóng accordion, xoay màn hình). Các đoạn `.line` của theme được ẩn bằng `visibility: hidden` để giữ nguyên chiều cao bố cục.
 
 **Bẫy đo vị trí (gặp ở v7):** phần tử bọc ngoài nào có `transform` thì Chrome lấy chính nó làm `offsetParent` của icon. Khi đó, tính bằng `list.offsetTop + marker.offsetTop` cho mọi icon ra 0 và thanh dài 0px. Cách đúng là cộng dồn `offsetTop` ngược lên tới `.timeline`. Không dùng `getBoundingClientRect` cho tâm ô, vì kết quả lệch theo mọi transform đang chạy, kể cả icon đang nhún khi hover.
 
