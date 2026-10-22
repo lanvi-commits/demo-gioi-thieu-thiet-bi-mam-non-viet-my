@@ -46,15 +46,26 @@ Trên điện thoại, hiệu ứng hover tự tắt. Máy bật "giảm chuyể
 
 - Một **thanh đỏ liền** chạy qua tâm các số 1 → 5, thay cho các đoạn nối rời. Cuộn xuống thì thanh dài ra, cuộn lên thì ngắn lại. Đầu thanh nằm ở vạch 60% chiều cao màn hình.
 - **Ô số** chưa được thanh chạm tới thì để viền rỗng như site. Thanh chạm tới thì ô chuyển dần (0,4 giây) sang tô đỏ đầy, số màu trắng. Ô đang đứng (ô cuối cùng thanh đã chạm) có thêm quầng mờ quanh. Thanh rút lên qua ô nào thì ô đó trở lại viền rỗng.
-- **Thẻ của từng bước** (v11, user 22/10: "cả section này ẩn hiện theo cuộn trang luôn, không phải chỉ thanh đỏ") hiện ra cùng lúc thanh chạm ô số của bước đó: mờ sang rõ và trượt lên 24px trong 0,5 giây. Thanh rút lên qua ô số thì thẻ ẩn lại. Thẻ và ô số luôn cùng trạng thái.
+- **Thẻ của từng bước co và giãn theo thanh**, làm trang ngắn lại hoặc dài ra (v12, user 22/10: "ẩn hiện section thì cũng đồng nghĩa với việc thu gọn và giãn trang").
+  - Thẻ chưa tới thì co hẳn về cao 0. Mỗi bước lúc này chỉ còn vòng số và đoạn nối (76px, mobile 68px), xếp sát nhau.
+  - Thanh chạm ô số bước nào thì thẻ bước đó giãn ra trong 0,5 giây, đẩy các vòng bên dưới và section sau xuống. Chữ trong thẻ hiện trễ 0,15 giây, sau khi khung thẻ đã bắt đầu mở.
+  - Thanh rút lên qua ô số thì thẻ co lại và trang ngắn đi.
+  - Thẻ và ô số luôn cùng trạng thái. Ở 1440px, khối dài 432px khi co hết và 752px khi giãn hết.
 - Các vòng số rỗng và rãnh mờ luôn hiện, làm đường ray báo trước còn bước phía dưới. Tiêu đề H2 và đoạn mô tả của section đứng yên, giống các section khác.
-- Dùng phím Tab tới nút của một thẻ đang ẩn thì thẻ đó hiện ra, vòng focus không rơi vào chỗ trống.
+- Dùng phím Tab tới nút của một thẻ đang co thì thẻ đó mở ra, vòng focus không rơi vào chỗ trống.
+- **Lưu ý SEO (Core Web Vitals):** khi thẻ giãn ra, mọi thứ bên dưới bị đẩy xuống, và Chrome tính đó là layout shift. Lăn chuột qua khối ở 1440px đo được **CLS 0,172**, vượt ngưỡng "tốt" là 0,1. Bản v11 (thẻ chỉ mờ đi, không co) có CLS bằng 0. Nếu đưa lên site thật, chỉ số CLS của URL /gioi-thieu/ có thể bị Google xếp vào mức "cần cải thiện".
 - Site đang tô đầy số của **bước đang mở accordion**. Ở demo, màu số do vị trí cuộn quyết định, nên bỏ kiểu tô đó. Thẻ đang mở vẫn giữ viền đỏ như site.
 - Máy bật "giảm chuyển động": thanh hiện đủ, mọi ô sáng sẵn, mọi thẻ hiện sẵn, không chuyển dần.
-- Thẻ chỉ bị ẩn khi JS đã chạy. Nếu JS lỗi, mọi thẻ vẫn hiện như site. Thẻ được ẩn bằng `opacity`, nên Google và trình đọc màn hình vẫn đọc đủ chữ.
-- Lịch sử: v7, v8 làm thẻ mờ theo vị trí riêng của từng thẻ. v9 cho thẻ đứng yên theo video mẫu. v11 cho thẻ ẩn/hiện bám đúng thanh.
+- Thẻ chỉ bị co khi JS đã chạy. Nếu JS lỗi, mọi thẻ vẫn hiện như site. Thẻ được co bằng chiều cao 0 kèm `overflow: clip`, không dùng `display` hay `visibility`, nên Google và trình đọc màn hình vẫn đọc đủ chữ.
+- Lịch sử: v7, v8 làm thẻ mờ theo vị trí riêng của từng thẻ. v9 cho thẻ đứng yên theo video mẫu. v11 cho thẻ mờ đi/hiện ra bám đúng thanh. v12 cho thẻ co/giãn chiều cao.
 
-**Cho DEV:** CSS ở mục 13 (Quy trình) và 11b (Hành trình mobile) trong khối `<style id="vmx-fx">`. JS ở phần "THEO VỊ TRÍ CUỘN" cuối khối `<script id="vmx-fx-cuon">`, dùng chung cho 2 thanh. Mỗi khung cuộn, JS đặt `--vmx-rail-p` (0 tới 1) lên `.timeline` để CSS vẽ thanh bằng `scaleY`, và gắn `.vmx-reached` / `.vmx-current` lên `.item` khi có ô đổi trạng thái. Thẻ `.card` dùng chung `.vmx-reached` đó. JS còn gắn `.vmx-rail-on` (chỉ khi có class này thẻ mới được ẩn) và `.vmx-rail-live` sau 2 khung hình (bật transition, để lúc tải lại trang giữa khối thẻ không chớp). Nền đỏ của ô là gradient, không chuyển dần được, nên được vẽ ở lớp `::before` và chỉ đổi `opacity`. Vị trí được đo lại khi bố cục đổi (ảnh tải xong, mở/đóng accordion, xoay màn hình). Các đoạn `.line` của theme được ẩn bằng `visibility: hidden` để giữ nguyên chiều cao bố cục.
+**Cho DEV:** CSS ở mục 13 (Quy trình) và 11b (Hành trình mobile) trong khối `<style id="vmx-fx">`. JS ở phần "THEO VỊ TRÍ CUỘN" cuối khối `<script id="vmx-fx-cuon">`, dùng chung cho 2 thanh. Mỗi khung cuộn, JS đặt `--vmx-rail-p` (0 tới 1) lên `.timeline` để CSS vẽ thanh bằng `scaleY`, và gắn `.vmx-reached` / `.vmx-current` lên `.item` khi có ô đổi trạng thái. Thẻ `.card` dùng chung `.vmx-reached` đó. JS còn gắn `.vmx-rail-on`, và chỉ khi có class này thẻ mới được co.
+
+Trạng thái đích của thẻ (co về 0 hoặc cao tự nhiên) nằm trong CSS. Đoạn co/giãn dần do hàm `fold()` trong JS chạy bằng WAAPI (`element.animate`), theo 3 bước: đo kích thước đang hiện, đổi class, đo kích thước đích. Không dùng `transition: height` vì chuyển dần từ `auto` sang 0 chỉ chạy được trên Chrome 129+, còn Safari sẽ nhảy cái một. Hết hiệu ứng, thẻ trả về `height: auto`, nên accordion vẫn mở/đóng bình thường. Hiệu ứng chỉ bật sau 2 khung hình kể từ lúc tải trang, để khi tải lại giữa khối thẻ đứng đúng trạng thái ngay.
+
+**Giới hạn trên Safari (theo tài liệu, chưa kiểm trên máy Safari thật):** Safari chưa hỗ trợ cơ chế giữ vị trí cuộn khi nội dung phía trên đổi cao (scroll anchoring, `overflow-anchor`). Vì vậy nếu người xem nhảy cóc từ trên xuống quá khối Quy trình (bấm link neo, tải lại trang ở vị trí bên dưới), các thẻ giãn ra phía trên sẽ đẩy nội dung đang xem xuống. Chrome và Firefox tự bù trừ trường hợp này.
+
+Nền đỏ của ô là gradient, không chuyển dần được, nên được vẽ ở lớp `::before` và chỉ đổi `opacity`. Vị trí được đo lại khi bố cục đổi (ảnh tải xong, mở/đóng accordion, xoay màn hình). Các đoạn `.line` của theme được ẩn bằng `visibility: hidden` để giữ nguyên chiều cao bố cục.
 
 **Bẫy đo vị trí (gặp ở v7):** phần tử bọc ngoài nào có `transform` thì Chrome lấy chính nó làm `offsetParent` của icon. Khi đó, tính bằng `list.offsetTop + marker.offsetTop` cho mọi icon ra 0 và thanh dài 0px. Cách đúng là cộng dồn `offsetTop` ngược lên tới `.timeline`. Không dùng `getBoundingClientRect` cho tâm ô, vì kết quả lệch theo mọi transform đang chạy, kể cả icon đang nhún khi hover.
 

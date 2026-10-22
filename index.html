@@ -785,23 +785,24 @@ html.vmx-fx #about_process .item.vmx-current .num { box-shadow: 0 0 0 6px var(--
 /* v11 — THẺ HIỆN/ẨN CÙNG THANH (user 22/10: "cả section này ẩn hiện theo cuộn trang luôn, không phải chỉ thanh đỏ").
    Thẻ bước nào hiện ra đúng lúc thanh chạm ô số bước đó (chung class .vmx-reached), thanh rút lên qua thì ẩn lại.
    Ô số + rãnh mờ vẫn hiện sẵn làm "đường ray" báo còn bước phía dưới; tiêu đề H2 + mô tả đứng yên như mọi section.
-   Ẩn bằng opacity + translate (không display/visibility) → Google, trình đọc màn hình vẫn đọc đủ chữ.
+   v12 (user 22/10: "ẩn hiện section thì cũng đồng nghĩa với việc thu gọn và giãn trang"): thẻ ẩn thì CO HẲN — cao 0,
+   đệm 0, mờ → trang ngắn lại; hiện thì giãn ra. Thẻ co, mỗi bước chỉ còn vòng số + đoạn nối (76px, mobile 68px) xếp
+   sát nhau làm đường ray; thanh chạm vòng nào thì thẻ của vòng đó giãn, đẩy các vòng bên dưới xuống.
+   Đây là trạng thái ĐÍCH; đoạn co/giãn dần do hieu-ung-cuon.js chạy bằng WAAPI (auto ↔ 0 không transition được ở Safari).
+   Ẩn bằng chiều cao 0 + overflow:clip, không display/visibility → Google, trình đọc màn hình vẫn đọc đủ chữ.
    .vmx-rail-on: JS đã chạy → mới được ẩn (JS lỗi thì thẻ hiện như live).
-   .vmx-rail-live: transition bật sau 2 khung → tải trang giữa chừng không chớp. */
-html.vmx-fx #about_process .timeline.vmx-rail-live .card {
-  transition: opacity 500ms var(--ease-out), translate 500ms var(--ease-out);
+   :focus-within: Tab bàn phím tới nút của thẻ đang co → thẻ mở ra, vòng focus không rơi vào chỗ trống. */
+html.vmx-fx #about_process .timeline.vmx-rail-on .card { overflow: clip; }   /* chữ không tràn ra lúc thẻ đang co/giãn dở */
+html.vmx-fx #about_process .timeline.vmx-rail-on .item:not(.vmx-reached):not(:focus-within) .card {
+  height: 0; padding-top: 0; padding-bottom: 0; opacity: 0;
 }
-html.vmx-fx #about_process .timeline.vmx-rail-on .item:not(.vmx-reached) .card { opacity: 0; translate: 0 24px; }
-/* Tab bàn phím tới nút của thẻ đang ẩn → hiện thẻ đó, không để vòng focus rơi vào chỗ trống */
-html.vmx-fx #about_process .timeline.vmx-rail-on .item:focus-within .card { opacity: 1; translate: none; }
 
 /* Giảm chuyển động: thanh đầy sẵn, mọi ô sáng sẵn (JS cũng coi như đã chạm hết), không chuyển màu dần, không sóng */
 @media (prefers-reduced-motion: reduce) {
   html.vmx-fx #about_journey .timeline::after,
   html.vmx-fx #about_process .timeline::after { transform: none; }
   html.vmx-fx #about_journey .icon, html.vmx-fx #about_journey .icon::before, html.vmx-fx #about_journey .icon-img,
-  html.vmx-fx #about_process .num, html.vmx-fx #about_process .num::before,
-  html.vmx-fx #about_process .timeline.vmx-rail-live .card { transition: none; }
+  html.vmx-fx #about_process .num, html.vmx-fx #about_process .num::before { transition: none; }
 }
 
 /* =====================================================================
@@ -5585,7 +5586,9 @@ var e="script#wp-emoji-settings",t=document.querySelector(e);if(!(t instanceof H
      (v7–v8 làm mờ/trượt cả thẻ theo cuộn — user: "không phải" + gửi video mẫu → v9 bỏ, thẻ đứng yên.)
      v11 (user 22/10: "cả section này ẩn hiện theo cuộn trang luôn, không phải chỉ thanh đỏ"): thẻ Quy trình hiện/ẩn
      theo CÙNG class .vmx-reached với ô số — thanh chạm ô số bước nào thì thẻ bước đó hiện, rút qua thì ẩn. Khác v8 ở
-     chỗ thẻ bám đúng thanh, không tự mờ theo vị trí riêng. JS chỉ gắn .vmx-rail-on / .vmx-rail-live, phần ẩn nằm ở CSS. */
+     chỗ thẻ bám đúng thanh, không tự mờ theo vị trí riêng.
+     v12 (user 22/10: "ẩn hiện section thì cũng đồng nghĩa với việc thu gọn và giãn trang"): thẻ ẩn thì CO HẲN (cao 0,
+     trang ngắn lại), hiện thì GIÃN ra (trang dài thêm) — xem fold(). Vòng số + đoạn nối vẫn chiếm chỗ làm đường ray. */
   function docY(el) {
     var y = 0;
     for (; el; el = el.offsetParent) y += el.offsetTop;
@@ -5597,12 +5600,12 @@ var e="script#wp-emoji-settings",t=document.querySelector(e);if(!(t instanceof H
 
   var rails = [
     { tl: '#about_journey .timeline', dot: '.icon', mq: '(max-width: 767.98px)' },
-    { tl: '#about_process .timeline', dot: '.num', mq: 'all' }
+    { tl: '#about_process .timeline', dot: '.num', mq: 'all', fold: '.card' }
   ].map(function (r) {
     var tl = document.querySelector(r.tl);
     var dots = tl ? [].slice.call(tl.querySelectorAll(r.dot)) : [];
     return { tl: tl, dots: dots, items: dots.map(function (d) { return d.closest('.item'); }),
-             mq: window.matchMedia(r.mq), top: 0, len: 0, centers: [], cur: -2 };
+             mq: window.matchMedia(r.mq), fold: r.fold, top: 0, len: 0, centers: [], cur: -2, live: false };
   }).filter(function (r) { return r.tl && r.dots.length > 1; });
   if (!rails.length) return;
 
@@ -5636,11 +5639,40 @@ var e="script#wp-emoji-settings",t=document.querySelector(e);if(!(t instanceof H
       r.cur = cur;
       r.items.forEach(function (it, i) {
         if (!it) return;
-        it.classList.toggle('vmx-reached', i <= cur);
+        var on = i <= cur;
+        if (r.fold && on !== it.classList.contains('vmx-reached')) fold(it, r.fold, on, r.live && !reduce.matches);
+        else it.classList.toggle('vmx-reached', on);
         it.classList.toggle('vmx-current', i === cur);
       });
     });
   }
+
+  /* v12 · Thẻ co / giãn chiều cao. Trạng thái đích nằm hết ở CSS: chưa tới = cao 0 + đệm 0 + mờ; tới = cao tự nhiên.
+     Chỉ đoạn CHUYỂN do WAAPI chạy: đo kích thước đang hiện (kể cả lúc đang dở hiệu ứng trước — cuộn ngược giữa chừng thì
+     đi tiếp từ đó, không giật về đầu) → đổi class → đo kích thước đích → animate 2 đầu. Hết hiệu ứng, thẻ trả về
+     height:auto của CSS → bấm "+" mở accordion vẫn đổi cao bình thường.
+     Không dùng transition height trong CSS: auto ↔ 0 chỉ chuyển dần được ở Chrome 129+ (interpolate-size), Safari nhảy cái một.
+     Chữ hiện trễ 150ms sau khi thẻ bắt đầu giãn (khung mở ra trước, chữ hiện sau); lúc co thì chữ mờ đi nhanh trước. */
+  var FOLD_MS = 500, EASE_OUT = 'cubic-bezier(0.23, 1, 0.32, 1)';
+  function box(el) {
+    var cs = getComputedStyle(el);
+    return { height: cs.height, paddingTop: cs.paddingTop, paddingBottom: cs.paddingBottom, opacity: cs.opacity };
+  }
+  function fold(it, sel, on, animate) {
+    var card = it.querySelector(sel);
+    if (!card || !animate || !card.animate) { it.classList.toggle('vmx-reached', on); return; }
+    var a = box(card);
+    card.getAnimations().forEach(function (x) { x.cancel(); });
+    it.classList.toggle('vmx-reached', on);
+    var b = box(card);
+    card.animate([
+      { height: a.height, paddingTop: a.paddingTop, paddingBottom: a.paddingBottom },
+      { height: b.height, paddingTop: b.paddingTop, paddingBottom: b.paddingBottom }
+    ], { duration: FOLD_MS, easing: EASE_OUT });
+    card.animate([{ opacity: a.opacity }, { opacity: b.opacity }],
+      { duration: on ? 350 : 200, delay: on ? 150 : 0, easing: 'ease', fill: 'backwards' });
+  }
+
   function onScroll() {
     if (!queued) { queued = true; requestAnimationFrame(update); }
   }
@@ -5654,11 +5686,11 @@ var e="script#wp-emoji-settings",t=document.querySelector(e);if(!(t instanceof H
     rails.forEach(function (r) { ro.observe(r.tl); });
   }
   measure();
-  // Bật transition sau khi trạng thái đầu đã vẽ ra (2 khung): lúc tải trang mà trình duyệt khôi phục vị trí cuộn
-  // ngay giữa Quy trình thì thẻ đứng đúng trạng thái luôn, không chớp hiện rồi mờ dần.
+  // Chỉ chạy hiệu ứng co/giãn sau khi trạng thái đầu đã vẽ ra (2 khung): lúc tải trang mà trình duyệt khôi phục vị trí
+  // cuộn ngay giữa Quy trình thì thẻ đứng đúng trạng thái luôn, không giãn/co trước mắt người xem.
   requestAnimationFrame(function () {
     requestAnimationFrame(function () {
-      rails.forEach(function (r) { r.tl.classList.add('vmx-rail-live'); });
+      rails.forEach(function (r) { r.live = true; });
     });
   });
 })();
