@@ -47,13 +47,14 @@ Trên điện thoại, hiệu ứng hover tự tắt. Máy bật "giảm chuyể
 - Một **thanh đỏ liền** chạy qua tâm các số 1 → 5, thay cho các đoạn nối rời. Cuộn xuống thì thanh dài ra, cuộn lên thì ngắn lại. Đầu thanh nằm ở vạch 60% chiều cao màn hình.
 - **Ô số** chưa được thanh chạm tới thì để viền rỗng như site. Thanh chạm tới thì ô chuyển dần (0,4 giây) sang tô đỏ đầy, số màu trắng. Ô đang đứng (ô cuối cùng thanh đã chạm) có thêm quầng mờ quanh. Thanh rút lên qua ô nào thì ô đó trở lại viền rỗng.
 - **Thẻ của từng bước co và giãn theo thanh**, làm trang ngắn lại hoặc dài ra (v12, user 22/10: "ẩn hiện section thì cũng đồng nghĩa với việc thu gọn và giãn trang").
-  - Thẻ chưa tới thì co hẳn về cao 0. Mỗi bước lúc này chỉ còn vòng số và đoạn nối (76px, mobile 68px), xếp sát nhau.
+  - **Bước 1 luôn hiện thẻ** (v13, user 22/10: "đối với bước số 1 hãy auto cố định hiển"): cuộn tới khối là thấy ngay nội dung bước đầu. Ô số 1 vẫn sáng theo thanh như các ô khác.
+  - Thẻ bước 2–5 chưa tới thì co hẳn về cao 0. Mỗi bước lúc này chỉ còn vòng số và đoạn nối (76px, mobile 68px), xếp sát nhau.
   - Thanh chạm ô số bước nào thì thẻ bước đó giãn ra trong 0,5 giây, đẩy các vòng bên dưới và section sau xuống. Chữ trong thẻ hiện trễ 0,15 giây, sau khi khung thẻ đã bắt đầu mở.
   - Thanh rút lên qua ô số thì thẻ co lại và trang ngắn đi.
-  - Thẻ và ô số luôn cùng trạng thái. Ở 1440px, khối dài 432px khi co hết và 752px khi giãn hết.
+  - Thẻ và ô số luôn cùng trạng thái. Ở 1440px, khối dài 535px khi co hết (bước 1 vẫn hiện) và 752px khi giãn hết.
 - Các vòng số rỗng và rãnh mờ luôn hiện, làm đường ray báo trước còn bước phía dưới. Tiêu đề H2 và đoạn mô tả của section đứng yên, giống các section khác.
 - Dùng phím Tab tới nút của một thẻ đang co thì thẻ đó mở ra, vòng focus không rơi vào chỗ trống.
-- **Lưu ý SEO (Core Web Vitals):** khi thẻ giãn ra, mọi thứ bên dưới bị đẩy xuống, và Chrome tính đó là layout shift. Lăn chuột qua khối ở 1440px đo 2 lần được **CLS 0,11 và 0,17** (dao động theo tốc độ cuộn), đều vượt ngưỡng "tốt" là 0,1. Bản v11 (thẻ chỉ mờ đi, không co) có CLS bằng 0. Nếu đưa lên site thật, chỉ số CLS của URL /gioi-thieu/ có thể bị Google xếp vào mức "cần cải thiện".
+- **Lưu ý SEO (Core Web Vitals):** khi thẻ giãn ra, mọi thứ bên dưới bị đẩy xuống, và Chrome tính đó là layout shift. Lăn chuột qua khối ở 1440px, bản v12 (bước 1 cũng co) đo 2 lần được **CLS 0,11 và 0,17** (dao động theo tốc độ cuộn), đều vượt ngưỡng "tốt" là 0,1. Bản v13 để bước 1 luôn hiện nên bớt một thẻ giãn, CLS giảm (xem số đo ở BRAND.md). Bản v11 (thẻ chỉ mờ đi, không co) có CLS bằng 0. Nếu đưa lên site thật, chỉ số CLS của URL /gioi-thieu/ có thể bị Google xếp vào mức "cần cải thiện".
 - Site đang tô đầy số của **bước đang mở accordion**. Ở demo, màu số do vị trí cuộn quyết định, nên bỏ kiểu tô đó. Thẻ đang mở vẫn giữ viền đỏ như site.
 - Máy bật "giảm chuyển động": thanh hiện đủ, mọi ô sáng sẵn, mọi thẻ hiện sẵn, không chuyển dần.
 - Thẻ chỉ bị co khi JS đã chạy. Nếu JS lỗi, mọi thẻ vẫn hiện như site. Thẻ được co bằng chiều cao 0 kèm `overflow: clip`, không dùng `display` hay `visibility`, nên Google và trình đọc màn hình vẫn đọc đủ chữ.

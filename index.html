@@ -791,9 +791,11 @@ html.vmx-fx #about_process .item.vmx-current .num { box-shadow: 0 0 0 6px var(--
    Đây là trạng thái ĐÍCH; đoạn co/giãn dần do hieu-ung-cuon.js chạy bằng WAAPI (auto ↔ 0 không transition được ở Safari).
    Ẩn bằng chiều cao 0 + overflow:clip, không display/visibility → Google, trình đọc màn hình vẫn đọc đủ chữ.
    .vmx-rail-on: JS đã chạy → mới được ẩn (JS lỗi thì thẻ hiện như live).
-   :focus-within: Tab bàn phím tới nút của thẻ đang co → thẻ mở ra, vòng focus không rơi vào chỗ trống. */
+   :focus-within: Tab bàn phím tới nút của thẻ đang co → thẻ mở ra, vòng focus không rơi vào chỗ trống.
+   v13 (user 22/10: "đối với bước số 1 hãy auto cố định hiển"): thẻ bước 1 LUÔN hiện, không co — cuộn tới khối là
+   thấy ngay nội dung bước đầu thay vì chỉ toàn vòng số. Ô số 1 vẫn sáng/tắt theo thanh như các ô khác. */
 html.vmx-fx #about_process .timeline.vmx-rail-on .card { overflow: clip; }   /* chữ không tràn ra lúc thẻ đang co/giãn dở */
-html.vmx-fx #about_process .timeline.vmx-rail-on .item:not(.vmx-reached):not(:focus-within) .card {
+html.vmx-fx #about_process .timeline.vmx-rail-on .item:not(:first-child):not(.vmx-reached):not(:focus-within) .card {
   height: 0; padding-top: 0; padding-bottom: 0; opacity: 0;
 }
 
@@ -5665,6 +5667,7 @@ var e="script#wp-emoji-settings",t=document.querySelector(e);if(!(t instanceof H
     card.getAnimations().forEach(function (x) { x.cancel(); });
     it.classList.toggle('vmx-reached', on);
     var b = box(card);
+    if (a.height === b.height && a.opacity === b.opacity) return;   // thẻ không đổi (vd bước 1 luôn hiện — v13)
     card.animate([
       { height: a.height, paddingTop: a.paddingTop, paddingBottom: a.paddingBottom },
       { height: b.height, paddingTop: b.paddingTop, paddingBottom: b.paddingBottom }
