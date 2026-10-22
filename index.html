@@ -482,7 +482,7 @@ var woocommerce_params = {"ajax_url":"/wp-admin/admin-ajax.php","wc_ajax_url":"/
   --rail-halo: rgba(215, 16, 16, .12);        /* quầng mờ quanh ô đang đứng (video mẫu) */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
-  --scg-ov-bg: rgba(17, 25, 39, .88);         /* = navy #111927 của bong bóng .card-tip theme, phủ 88% (mục 14) */
+  --scg-ov-bg: rgba(17, 25, 39, .62);         /* = navy #111927 của bong bóng .card-tip theme, phủ 62% (mục 14; v14 = 88%) */
 }
 
 /* ---------------------------------------------------------------------
@@ -827,7 +827,9 @@ html.vmx-fx #about_process .timeline.vmx-rail-on .item:not(:first-child):not(.vm
      Cả thẻ vẫn là 1 link; "Xem thêm" chỉ là chữ gợi ý, không phải link thứ 2.
    - Chỉ máy có chuột. Điện thoại/tablet cảm ứng: chạm là vào trang danh mục như live (không bắt chạm 2 lần).
      Bàn phím: Tab tới thẻ (:focus-visible) cũng hiện.
-   - Chữ trắng trên nền navy 88%: tương phản ≥ 12:1 trên cả 11 màu thẻ.
+   - v16 (user 22/10: "sáng xíu để có thể thấy nền bên dưới"): phủ 88% → 62%, nhoè 6px → 2px. Chụp thử 88/72/62/52%:
+     52% chữ khó đọc trên ảnh nhiều màu (thẻ TT32) → dừng ở 62%. Chữ trắng, trường hợp xấu nhất (nền trắng dưới lớp phủ)
+     ≈ 4,95:1 — vẫn đạt AA 4,5:1 (v14: ≥ 12:1).
    --------------------------------------------------------------------- */
 .vmx-scg-ov { display: none; }                                   /* công tắc Tắt = như live */
 html.vmx-fx #shop_category_groups .card-tip { display: none; }   /* bong bóng cũ — vẫn là aria-describedby của thẻ 1 */
@@ -836,7 +838,7 @@ html.vmx-fx #shop_category_groups .vmx-scg-ov {
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
   padding: 16px 14px; border-radius: inherit;
   background: var(--scg-ov-bg);
-  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); /* ảnh + tên nhóm phía sau nhoè như mẫu */
+  -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); /* ảnh phía sau nhoè nhẹ: vẫn nhận ra đồ chơi (v14: 6px) */
   color: #ffffff; text-align: center;
   opacity: 0; visibility: hidden;
   transition: opacity .3s ease, visibility 0s linear .3s;        /* rời chuột: mờ hết rồi mới ẩn hẳn */
@@ -852,7 +854,7 @@ html.vmx-fx #shop_category_groups .vmx-scg-ov__more {
   transform: translateY(8px); transition: transform .35s var(--ease-out) 40ms;
 }
 html.vmx-fx #shop_category_groups .vmx-scg-ov__more i { font-size: 12px; transition: transform .2s var(--ease-out); }
-/* tên nhóm chữ navy nằm ngay dưới "Xem thêm" → qua lớp phủ 88% vẫn lộ thành bóng mờ đè chữ (đo v14 nháp) → tắt đi như mẫu */
+/* tên nhóm chữ navy nằm ngay dưới "Xem thêm" → qua lớp phủ (88% ở v14, nay 62%) vẫn lộ thành bóng mờ đè chữ (đo v14 nháp) → tắt đi như mẫu */
 html.vmx-fx #shop_category_groups .card .label { transition: opacity .2s ease; }
 html.vmx-fx #shop_category_groups .card:focus-visible .label { opacity: 0; }
 html.vmx-fx #shop_category_groups .card:focus-visible .vmx-scg-ov { opacity: 1; visibility: visible; transition: opacity .3s ease, visibility 0s; }

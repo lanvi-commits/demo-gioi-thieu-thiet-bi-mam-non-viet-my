@@ -75,11 +75,11 @@ Nền đỏ của ô là gradient, không chuyển dần được, nên được
 Ở site hiện tại, chỉ thẻ "Đồ chơi vận động mầm non" có mô tả. Mô tả hiện thành bong bóng đen nằm phía trên thẻ, nên ở hàng đầu bị thanh menu che mất nửa trên, chữ còn bị cắt giữa từ ("…những năm th…"). 10 thẻ còn lại không có gì.
 
 Demo làm theo mẫu thẻ luật sư user gửi:
-- Rê chuột lên thẻ thì một lớp navy phủ kín thẻ (cùng màu bong bóng cũ, độ phủ 88%), ảnh phía sau nhoè đi. Tên nhóm ẩn, đoạn mô tả hiện ở giữa thẻ, bên dưới là chữ "Xem thêm →". Lớp phủ mờ dần vào trong 0,3 giây, chữ trượt lên 8px.
+- Rê chuột lên thẻ thì một lớp navy phủ kín thẻ (cùng màu bong bóng cũ, độ phủ 62%), ảnh phía sau nhoè nhẹ 2px nên vẫn nhận ra đồ chơi. Bản v14 dùng độ phủ 88% và nhoè 6px. User thấy tối quá ("sáng xíu để có thể thấy nền bên dưới") nên v16 hạ xuống. Tên nhóm ẩn, đoạn mô tả hiện ở giữa thẻ, bên dưới là chữ "Xem thêm →". Lớp phủ mờ dần vào trong 0,3 giây, chữ trượt lên 8px.
 - Áp cho cả 11 thẻ, bỏ bong bóng cũ.
 - Cả thẻ vẫn là 1 link sang trang danh mục. "Xem thêm" chỉ là chữ gợi ý, không phải link thứ hai.
 - Chỉ chạy trên máy có chuột. Trên điện thoại và tablet cảm ứng, thẻ giữ như site: chạm vào là sang trang danh mục, không phải chạm 2 lần. Dùng phím Tab tới thẻ thì mô tả cũng hiện.
-- Chữ trắng trên lớp navy đạt tương phản trên 12:1 ở cả 11 màu thẻ. Lớp phủ dùng `position: absolute` và chỉ đổi `opacity`, nên không làm trang xê dịch (không ảnh hưởng CLS).
+- Chữ trắng trên lớp navy 62% đạt tương phản khoảng 4,95:1 ở trường hợp xấu nhất (phía sau là nền trắng), vẫn qua chuẩn AA 4,5:1. Đã thử hạ xuống 52% nhưng chữ khó đọc trên ảnh nhiều màu. Lớp phủ dùng `position: absolute` và chỉ đổi `opacity`, nên không làm trang xê dịch (không ảnh hưởng CLS).
 - Trình đọc màn hình: lớp phủ có `aria-hidden`, còn link trỏ `aria-describedby` vào nó. Tên link vẫn là tên nhóm, mô tả được đọc thành phần mô tả, không bị đọc 2 lần.
 
 **Nội dung mô tả là bản mẫu, cần khách duyệt.** Site chỉ có mô tả danh mục cho Đồ chơi vận động, nên câu của thẻ này lấy đúng từ mô tả đó. 10 nhóm còn lại chưa có mô tả, nên câu được ghép từ các danh mục con đang hiện trên trang danh mục của từng nhóm (đọc ngày 22/10), không thêm số liệu hay chứng nhận nào. Hai nhóm Thông tư 02 và Thông tư 32 viết theo đúng tên danh mục của thông tư.
