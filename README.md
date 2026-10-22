@@ -1,6 +1,6 @@
 # Demo hiệu ứng: trang Giới thiệu Thiết bị mầm non Việt Mỹ
 
-Bản chụp nguyên trang https://website-demo-02.thcmedia.vn/gioi-thieu/ (ngày 21/10/2026). **Không đổi nội dung hay thứ tự section nào.** Demo phủ thêm 6 hiệu ứng, thu gọn khoảng cách giữa các section, chỉnh cỡ chữ theo tab "Size chữ", làm gọn hero, thêm hover cho 3 khối Tầm nhìn & Sứ mệnh, Hành trình phát triển, Giá trị cốt lõi, và thêm thanh liền với ô sáng dần theo cuộn cho Quy trình tư vấn và Hành trình (mobile).
+Bản chụp nguyên trang https://website-demo-02.thcmedia.vn/gioi-thieu/ (ngày 21/10/2026). **Không đổi nội dung hay thứ tự section nào.** Demo phủ thêm 6 hiệu ứng, thu gọn khoảng cách giữa các section, chỉnh cỡ chữ theo tab "Size chữ", làm gọn hero, thêm hover cho 3 khối Tầm nhìn & Sứ mệnh, Hành trình phát triển, Giá trị cốt lõi, thêm thanh liền với ô sáng dần theo cuộn cho Quy trình tư vấn và Hành trình (mobile), và hiện mô tả khi rê chuột lên thẻ Mua theo nhóm Thiết bị.
 
 **Xem demo:** https://lanvi-commits.github.io/demo-gioi-thieu-thiet-bi-mam-non-viet-my/
 
@@ -69,6 +69,31 @@ Trạng thái đích của thẻ (co về 0 hoặc cao tự nhiên) nằm trong 
 Nền đỏ của ô là gradient, không chuyển dần được, nên được vẽ ở lớp `::before` và chỉ đổi `opacity`. Vị trí được đo lại khi bố cục đổi (ảnh tải xong, mở/đóng accordion, xoay màn hình). Các đoạn `.line` của theme được ẩn bằng `visibility: hidden` để giữ nguyên chiều cao bố cục.
 
 **Bẫy đo vị trí (gặp ở v7):** phần tử bọc ngoài nào có `transform` thì Chrome lấy chính nó làm `offsetParent` của icon. Khi đó, tính bằng `list.offsetTop + marker.offsetTop` cho mọi icon ra 0 và thanh dài 0px. Cách đúng là cộng dồn `offsetTop` ngược lên tới `.timeline`. Không dùng `getBoundingClientRect` cho tâm ô, vì kết quả lệch theo mọi transform đang chạy, kể cả icon đang nhún khi hover.
+
+## Mua theo nhóm Thiết bị: rê chuột lên thẻ thì hiện mô tả (v14)
+
+Ở site hiện tại, chỉ thẻ "Đồ chơi vận động mầm non" có mô tả. Mô tả hiện thành bong bóng đen nằm phía trên thẻ, nên ở hàng đầu bị thanh menu che mất nửa trên, chữ còn bị cắt giữa từ ("…những năm th…"). 10 thẻ còn lại không có gì.
+
+Demo làm theo mẫu thẻ luật sư user gửi:
+- Rê chuột lên thẻ thì một lớp navy phủ kín thẻ (cùng màu bong bóng cũ, độ phủ 88%), ảnh phía sau nhoè đi. Tên nhóm ẩn, đoạn mô tả hiện ở giữa thẻ, bên dưới là chữ "Xem thêm →". Lớp phủ mờ dần vào trong 0,3 giây, chữ trượt lên 8px.
+- Áp cho cả 11 thẻ, bỏ bong bóng cũ.
+- Cả thẻ vẫn là 1 link sang trang danh mục. "Xem thêm" chỉ là chữ gợi ý, không phải link thứ hai.
+- Chỉ chạy trên máy có chuột. Trên điện thoại và tablet cảm ứng, thẻ giữ như site: chạm vào là sang trang danh mục, không phải chạm 2 lần. Dùng phím Tab tới thẻ thì mô tả cũng hiện.
+- Chữ trắng trên lớp navy đạt tương phản trên 12:1 ở cả 11 màu thẻ. Lớp phủ dùng `position: absolute` và chỉ đổi `opacity`, nên không làm trang xê dịch (không ảnh hưởng CLS).
+- Trình đọc màn hình: lớp phủ có `aria-hidden`, còn link trỏ `aria-describedby` vào nó. Tên link vẫn là tên nhóm, mô tả được đọc thành phần mô tả, không bị đọc 2 lần.
+
+**Nội dung mô tả là bản mẫu, cần khách duyệt.** Site chỉ có mô tả danh mục cho Đồ chơi vận động, nên câu của thẻ này lấy đúng từ mô tả đó. 10 nhóm còn lại chưa có mô tả, nên câu được ghép từ các danh mục con đang hiện trên trang danh mục của từng nhóm (đọc ngày 22/10), không thêm số liệu hay chứng nhận nào. Hai nhóm Thông tư 02 và Thông tư 32 viết theo đúng tên danh mục của thông tư.
+
+**Cho DEV:** CSS ở mục 14 trong khối `<style id="vmx-fx">`. Trong theme, chèn vào cuối thẻ `<a class="card">` của component `shop_category_groups`:
+
+```html
+<span class="vmx-scg-ov" id="…" aria-hidden="true">
+  <span class="vmx-scg-ov__desc">{mô tả danh mục}</span>
+  <span class="vmx-scg-ov__more">Xem thêm<i class="fa-light fa-arrow-right" aria-hidden="true"></i></span>
+</span>
+```
+
+Lấy mô tả từ trường Mô tả của danh mục WooCommerce, cắt gọn khoảng 100 ký tự. Bản live hiện đang ghép cả tiêu đề H2 lẫn đoạn đầu của mô tả nên bị lặp tên nhóm. CSS có `line-clamp` 7 dòng (mobile 5) để phòng câu dài. Có thể bỏ `<span class="card-tip">` cũ.
 
 ## Khoảng cách giữa các section (sheet dòng 114)
 

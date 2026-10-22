@@ -482,6 +482,7 @@ var woocommerce_params = {"ajax_url":"/wp-admin/admin-ajax.php","wc_ajax_url":"/
   --rail-halo: rgba(215, 16, 16, .12);        /* quầng mờ quanh ô đang đứng (video mẫu) */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --scg-ov-bg: rgba(17, 25, 39, .88);         /* = navy #111927 của bong bóng .card-tip theme, phủ 88% (mục 14) */
 }
 
 /* ---------------------------------------------------------------------
@@ -805,6 +806,65 @@ html.vmx-fx #about_process .timeline.vmx-rail-on .item:not(:first-child):not(.vm
   html.vmx-fx #about_process .timeline::after { transform: none; }
   html.vmx-fx #about_journey .icon, html.vmx-fx #about_journey .icon::before, html.vmx-fx #about_journey .icon-img,
   html.vmx-fx #about_process .num, html.vmx-fx #about_process .num::before { transition: none; }
+}
+
+/* ---------------------------------------------------------------------
+   14 · MUA THEO NHÓM THIẾT BỊ — RÊ CHUỘT LÊN THẺ THÌ HIỆN MÔ TẢ NHÓM (v14, user 22/10: "hover vào hiển mô tả như mẫu").
+   Mẫu (thẻ luật sư): lớp tối phủ kín thẻ, ảnh mờ phía sau, đoạn mô tả căn giữa + chữ "Learn More" bên dưới.
+   (Bong bóng "General phục vụ…" trên ảnh mẫu là khung dịch của Chrome, không thuộc thiết kế → không làm.)
+   Live: chỉ thẻ Đồ chơi vận động có mô tả, hiện thành bong bóng đen NẰM TRÊN thẻ (.card-tip) → hàng đầu bị thanh menu
+   dính đỉnh che nửa trên, chữ bị cắt giữa từ ("…những năm th…"). Demo: bỏ bong bóng, mô tả nằm TRONG thẻ, đủ 11 nhóm.
+   - Lớp phủ = <span class="vmx-scg-ov"> do build.py chèn vào cuối <a class="card"> (nội dung: SCG_DESC trong build.py).
+     Cả thẻ vẫn là 1 link; "Xem thêm" chỉ là chữ gợi ý, không phải link thứ 2.
+   - Chỉ máy có chuột. Điện thoại/tablet cảm ứng: chạm là vào trang danh mục như live (không bắt chạm 2 lần).
+     Bàn phím: Tab tới thẻ (:focus-visible) cũng hiện.
+   - Chữ trắng trên nền navy 88%: tương phản ≥ 12:1 trên cả 11 màu thẻ.
+   --------------------------------------------------------------------- */
+.vmx-scg-ov { display: none; }                                   /* công tắc Tắt = như live */
+html.vmx-fx #shop_category_groups .card-tip { display: none; }   /* bong bóng cũ — vẫn là aria-describedby của thẻ 1 */
+html.vmx-fx #shop_category_groups .vmx-scg-ov {
+  position: absolute; inset: 0; z-index: 2;                      /* trên .media/.label (z-index 1) */
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+  padding: 16px 14px; border-radius: inherit;
+  background: var(--scg-ov-bg);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); /* ảnh + tên nhóm phía sau nhoè như mẫu */
+  color: #ffffff; text-align: center;
+  opacity: 0; visibility: hidden;
+  transition: opacity .3s ease, visibility 0s linear .3s;        /* rời chuột: mờ hết rồi mới ẩn hẳn */
+}
+html.vmx-fx #shop_category_groups .vmx-scg-ov__desc {
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 7; overflow: hidden;
+  font-size: 14px; font-weight: 500; line-height: 1.5;
+  transform: translateY(8px); transition: transform .35s var(--ease-out);
+}
+html.vmx-fx #shop_category_groups .vmx-scg-ov__more {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 14px; font-weight: 700; line-height: 1.2;
+  transform: translateY(8px); transition: transform .35s var(--ease-out) 40ms;
+}
+html.vmx-fx #shop_category_groups .vmx-scg-ov__more i { font-size: 12px; transition: transform .2s var(--ease-out); }
+/* tên nhóm chữ navy nằm ngay dưới "Xem thêm" → qua lớp phủ 88% vẫn lộ thành bóng mờ đè chữ (đo v14 nháp) → tắt đi như mẫu */
+html.vmx-fx #shop_category_groups .card .label { transition: opacity .2s ease; }
+html.vmx-fx #shop_category_groups .card:focus-visible .label { opacity: 0; }
+html.vmx-fx #shop_category_groups .card:focus-visible .vmx-scg-ov { opacity: 1; visibility: visible; transition: opacity .3s ease, visibility 0s; }
+html.vmx-fx #shop_category_groups .card:focus-visible .vmx-scg-ov__desc,
+html.vmx-fx #shop_category_groups .card:focus-visible .vmx-scg-ov__more { transform: none; }
+@media (hover: hover) and (pointer: fine) {
+  html.vmx-fx #shop_category_groups .card:hover .label { opacity: 0; }
+  html.vmx-fx #shop_category_groups .card:hover .vmx-scg-ov { opacity: 1; visibility: visible; transition: opacity .3s ease, visibility 0s; }
+  html.vmx-fx #shop_category_groups .card:hover .vmx-scg-ov__desc,
+  html.vmx-fx #shop_category_groups .card:hover .vmx-scg-ov__more { transform: none; }
+  html.vmx-fx #shop_category_groups .card:hover .vmx-scg-ov__more i { transform: translateX(3px); }
+}
+/* ≤767 (cửa sổ máy tính thu hẹp — cảm ứng không có hover): thẻ chỉ còn ~170 × 165px */
+@media (max-width: 767px) {
+  html.vmx-fx #shop_category_groups .vmx-scg-ov { gap: 8px; padding: 10px 8px; }
+  html.vmx-fx #shop_category_groups .vmx-scg-ov__desc { font-size: 12px; -webkit-line-clamp: 5; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html.vmx-fx #shop_category_groups .vmx-scg-ov__desc,
+  html.vmx-fx #shop_category_groups .vmx-scg-ov__more,
+  html.vmx-fx #shop_category_groups .vmx-scg-ov__more i { transform: none !important; transition: none; }
 }
 
 /* =====================================================================
@@ -2775,108 +2835,108 @@ html.vmx-fx .breadcrumb-wrapper .rank-math-breadcrumb :is(a, span, p) { font-siz
 		<div class="media">
 							<img width="300" height="242" src="https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/van-dong-300x242.png" class="img" alt="Đồ chơi vận động mầm non" loading="lazy" decoding="async" srcset="https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/van-dong-300x242.png 300w, https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/van-dong.png 368w" sizes="auto, (max-width: 300px) 100vw, 300px" />					</div>
 					<div class="label">Đồ chơi vận động mầm non</div>
-			</a>
+			<span class="vmx-scg-ov" id="vmx-scg-d1" aria-hidden="true"><span class="vmx-scg-ov__desc">Giúp bé rèn luyện sự khéo léo, cân bằng và sức bền ngay từ những năm tháng đầu đời.</span><span class="vmx-scg-ov__more">Xem thêm<i class="fa-light fa-arrow-right" aria-hidden="true"></i></span></span></a>
 					<span class="card-tip" id="scg-tip-1" role="tooltip">Đồ chơi vận động mầm non – phát triển thể chất toàn diện cho bé Đồ chơi vận động mầm non giúp bé rèn luyện sự khéo léo, cân bằng và sức bền ngay từ những năm th…</span>
 			</div>
 		<div class="card-wrap">
-	<a		class="card card--blue"
+	<a aria-describedby="vmx-scg-d2"		class="card card--blue"
 							href="https://website-demo-02.thcmedia.vn/thiet-bi-truong-hoc/"
 			target="_self"
 						>
 		<div class="media">
 							<img width="300" height="233" src="https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/truong-hoc-300x233.png" class="img" alt="Thiết bị trường học" loading="lazy" decoding="async" srcset="https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/truong-hoc-300x233.png 300w, https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/truong-hoc.png 368w" sizes="auto, (max-width: 300px) 100vw, 300px" />					</div>
 					<div class="label">Thiết bị trường học</div>
-			</a>
+			<span class="vmx-scg-ov" id="vmx-scg-d2" aria-hidden="true"><span class="vmx-scg-ov__desc">Bàn ghế học sinh, tủ kệ đồ chơi, thảm trải sàn, bảng viết và kệ sách cho lớp học mầm non.</span><span class="vmx-scg-ov__more">Xem thêm<i class="fa-light fa-arrow-right" aria-hidden="true"></i></span></span></a>
 			</div>
 		<div class="card-wrap">
-	<a		class="card card--purple"
+	<a aria-describedby="vmx-scg-d3"		class="card card--purple"
 							href="https://website-demo-02.thcmedia.vn/do-choi-ngoai-troi-mam-non/"
 			target="_self"
 						>
 		<div class="media">
 							<img width="300" height="233" src="https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/ngoai-troi-300x233.png" class="img" alt="Đồ chơi ngoài trời mầm non" loading="lazy" decoding="async" srcset="https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/ngoai-troi-300x233.png 300w, https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/ngoai-troi.png 368w" sizes="auto, (max-width: 300px) 100vw, 300px" />					</div>
 					<div class="label">Đồ chơi ngoài trời mầm non</div>
-			</a>
+			<span class="vmx-scg-ov" id="vmx-scg-d3" aria-hidden="true"><span class="vmx-scg-ov__desc">Xích đu, đu quay, thang leo, cầu trượt liên hoàn và cầu thăng bằng cho sân trường, sân chơi.</span><span class="vmx-scg-ov__more">Xem thêm<i class="fa-light fa-arrow-right" aria-hidden="true"></i></span></span></a>
 			</div>
 		<div class="card-wrap">
-	<a		class="card card--mint"
+	<a aria-describedby="vmx-scg-d4"		class="card card--mint"
 							href="https://website-demo-02.thcmedia.vn/do-choi-khu-vui-choi-trong-nha/"
 			target="_self"
 						>
 		<div class="media">
 							<img width="300" height="233" src="https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/trong-nha-300x233.png" class="img" alt="Đồ chơi khu vui chơi trong nhà" loading="lazy" decoding="async" srcset="https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/trong-nha-300x233.png 300w, https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/trong-nha.png 368w" sizes="auto, (max-width: 300px) 100vw, 300px" />					</div>
 					<div class="label">Đồ chơi khu vui chơi trong nhà</div>
-			</a>
+			<span class="vmx-scg-ov" id="vmx-scg-d4" aria-hidden="true"><span class="vmx-scg-ov__desc">Nhà banh, nhà liên hoàn, hang chui, cầu trượt và xe chòi chân cho khu vui chơi trong nhà.</span><span class="vmx-scg-ov__more">Xem thêm<i class="fa-light fa-arrow-right" aria-hidden="true"></i></span></span></a>
 			</div>
 		<div class="card-wrap">
-	<a		class="card card--peach"
+	<a aria-describedby="vmx-scg-d5"		class="card card--peach"
 							href="https://website-demo-02.thcmedia.vn/do-choi-mam-non-nhap-khau/"
 			target="_self"
 						>
 		<div class="media">
 							<img width="300" height="233" src="https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/nhap-khau-300x233.png" class="img" alt="Đồ chơi mầm non nhập khẩu" loading="lazy" decoding="async" srcset="https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/nhap-khau-300x233.png 300w, https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/nhap-khau.png 368w" sizes="auto, (max-width: 300px) 100vw, 300px" />					</div>
 					<div class="label">Đồ chơi mầm non nhập khẩu</div>
-			</a>
+			<span class="vmx-scg-ov" id="vmx-scg-d5" aria-hidden="true"><span class="vmx-scg-ov__desc">Bập bênh, cầu trượt, nhà banh, xích đu, thú nhún và xe đạp 3 bánh nhập khẩu cho bé.</span><span class="vmx-scg-ov__more">Xem thêm<i class="fa-light fa-arrow-right" aria-hidden="true"></i></span></span></a>
 			</div>
 		<div class="card-wrap">
-	<a		class="card card--lavender"
+	<a aria-describedby="vmx-scg-d6"		class="card card--lavender"
 							href="https://website-demo-02.thcmedia.vn/do-choi-thong-minh/"
 			target="_self"
 						>
 		<div class="media">
 							<img width="300" height="233" src="https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/thong-minh-300x233.png" class="img" alt="Đồ chơi thông minh" loading="lazy" decoding="async" srcset="https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/thong-minh-300x233.png 300w, https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/thong-minh.png 368w" sizes="auto, (max-width: 300px) 100vw, 300px" />					</div>
 					<div class="label">Đồ chơi thông minh</div>
-			</a>
+			<span class="vmx-scg-ov" id="vmx-scg-d6" aria-hidden="true"><span class="vmx-scg-ov__desc">Đồ chơi lắp ghép, STEM, robot giáo dục, bảng tương tác và bộ thí nghiệm khoa học cho bé.</span><span class="vmx-scg-ov__more">Xem thêm<i class="fa-light fa-arrow-right" aria-hidden="true"></i></span></span></a>
 			</div>
 		<div class="card-wrap">
-	<a		class="card card--cyan"
+	<a aria-describedby="vmx-scg-d7"		class="card card--cyan"
 							href="https://website-demo-02.thcmedia.vn/thiet-bi-the-chat-mam-non/"
 			target="_self"
 						>
 		<div class="media">
 							<img width="300" height="233" src="https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/the-chat-300x233.png" class="img" alt="Thiết bị thể chất mầm non" loading="lazy" decoding="async" srcset="https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/the-chat-300x233.png 300w, https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/the-chat.png 368w" sizes="auto, (max-width: 300px) 100vw, 300px" />					</div>
 					<div class="label">Thiết bị thể chất mầm non</div>
-			</a>
+			<span class="vmx-scg-ov" id="vmx-scg-d7" aria-hidden="true"><span class="vmx-scg-ov__desc">Bóng rổ, khung thành, cầu thăng bằng, bạt nhún và dụng cụ tập gym cho giờ thể chất của bé.</span><span class="vmx-scg-ov__more">Xem thêm<i class="fa-light fa-arrow-right" aria-hidden="true"></i></span></span></a>
 			</div>
 		<div class="card-wrap">
-	<a		class="card card--apricot"
+	<a aria-describedby="vmx-scg-d8"		class="card card--apricot"
 							href="https://website-demo-02.thcmedia.vn/thiet-bi-san-choi/"
 			target="_self"
 						>
 		<div class="media">
 							<img width="300" height="233" src="https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/san-choi-300x233.png" class="img" alt="Thiết bị sân chơi" loading="lazy" decoding="async" srcset="https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/san-choi-300x233.png 300w, https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/san-choi.png 368w" sizes="auto, (max-width: 300px) 100vw, 300px" />					</div>
 					<div class="label">Thiết bị sân chơi</div>
-			</a>
+			<span class="vmx-scg-ov" id="vmx-scg-d8" aria-hidden="true"><span class="vmx-scg-ov__desc">Xích đu, nhà banh, đu quay, thang leo, bập bênh, thú nhún và cầu trượt liên hoàn ngoài trời.</span><span class="vmx-scg-ov__more">Xem thêm<i class="fa-light fa-arrow-right" aria-hidden="true"></i></span></span></a>
 			</div>
 		<div class="card-wrap">
-	<a		class="card card--green"
+	<a aria-describedby="vmx-scg-d9"		class="card card--green"
 							href="https://website-demo-02.thcmedia.vn/thiet-bi-cong-vien/"
 			target="_self"
 						>
 		<div class="media">
 							<img width="300" height="233" src="https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/cong-vien-300x233.png" class="img" alt="Thiết bị công viên" loading="lazy" decoding="async" srcset="https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/cong-vien-300x233.png 300w, https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/cong-vien.png 368w" sizes="auto, (max-width: 300px) 100vw, 300px" />					</div>
 					<div class="label">Thiết bị công viên</div>
-			</a>
+			<span class="vmx-scg-ov" id="vmx-scg-d9" aria-hidden="true"><span class="vmx-scg-ov__desc">Dụng cụ thể dục ngoài trời cho công viên: đi bộ trên không, đạp xe tại chỗ, xoay eo, tập tay vai.</span><span class="vmx-scg-ov__more">Xem thêm<i class="fa-light fa-arrow-right" aria-hidden="true"></i></span></span></a>
 			</div>
 		<div class="card-wrap">
-	<a		class="card card--pink"
+	<a aria-describedby="vmx-scg-d10"		class="card card--pink"
 							href="https://website-demo-02.thcmedia.vn/thiet-bi-do-choi-ngoai-troi-tt32/"
 			target="_self"
 						>
 		<div class="media">
 							<img width="300" height="233" src="https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/thong-tu-32-300x233.png" class="img" alt="Thiết bị, đồ chơi ngoài trời theo Thông tư 32" loading="lazy" decoding="async" srcset="https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/thong-tu-32-300x233.png 300w, https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/thong-tu-32.png 368w" sizes="auto, (max-width: 300px) 100vw, 300px" />					</div>
 					<div class="label">Thiết bị, đồ chơi ngoài trời theo Thông tư 32</div>
-			</a>
+			<span class="vmx-scg-ov" id="vmx-scg-d10" aria-hidden="true"><span class="vmx-scg-ov__desc">Thiết bị, đồ chơi ngoài trời theo danh mục Thông tư 32/2012 của Bộ GD&amp;ĐT cho nhà trẻ và mẫu giáo.</span><span class="vmx-scg-ov__more">Xem thêm<i class="fa-light fa-arrow-right" aria-hidden="true"></i></span></span></a>
 			</div>
 		<div class="card-wrap">
-	<a		class="card card--sky"
+	<a aria-describedby="vmx-scg-d11"		class="card card--sky"
 							href="https://website-demo-02.thcmedia.vn/do-dung-do-choi-theo-thong-tu-02/"
 			target="_self"
 						>
 		<div class="media">
 							<img width="300" height="233" src="https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/thong-tu-02-300x233.png" class="img" alt="Đồ dùng - Đồ chơi theo Thông tư 02" loading="lazy" decoding="async" srcset="https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/thong-tu-02-300x233.png 300w, https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/thong-tu-02.png 368w" sizes="auto, (max-width: 300px) 100vw, 300px" />					</div>
 					<div class="label">Đồ dùng - Đồ chơi theo Thông tư 02</div>
-			</a>
+			<span class="vmx-scg-ov" id="vmx-scg-d11" aria-hidden="true"><span class="vmx-scg-ov__desc">Đồ dùng, đồ chơi và thiết bị dạy học tối thiểu cho giáo dục mầm non theo danh mục Thông tư 02/2010.</span><span class="vmx-scg-ov__more">Xem thêm<i class="fa-light fa-arrow-right" aria-hidden="true"></i></span></span></a>
 			</div>
 			</div>
 
@@ -2897,116 +2957,116 @@ html.vmx-fx .breadcrumb-wrapper .rank-math-breadcrumb :is(a, span, p) { font-siz
 		<div class="media">
 							<img width="300" height="242" src="https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/van-dong-300x242.png" class="img" alt="Đồ chơi vận động mầm non" loading="lazy" decoding="async" srcset="https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/van-dong-300x242.png 300w, https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/van-dong.png 368w" sizes="auto, (max-width: 300px) 100vw, 300px" />					</div>
 					<div class="label">Đồ chơi vận động mầm non</div>
-			</a>
+			<span class="vmx-scg-ov" id="vmx-scg-d12" aria-hidden="true"><span class="vmx-scg-ov__desc">Giúp bé rèn luyện sự khéo léo, cân bằng và sức bền ngay từ những năm tháng đầu đời.</span><span class="vmx-scg-ov__more">Xem thêm<i class="fa-light fa-arrow-right" aria-hidden="true"></i></span></span></a>
 					<span class="card-tip" id="scg-tip-12" role="tooltip">Đồ chơi vận động mầm non – phát triển thể chất toàn diện cho bé Đồ chơi vận động mầm non giúp bé rèn luyện sự khéo léo, cân bằng và sức bền ngay từ những năm th…</span>
 			</div>
 		<div class="card-wrap">
-	<a		class="card card--blue"
+	<a aria-describedby="vmx-scg-d13"		class="card card--blue"
 							href="https://website-demo-02.thcmedia.vn/thiet-bi-truong-hoc/"
 			target="_self"
 						>
 		<div class="media">
 							<img width="300" height="233" src="https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/truong-hoc-300x233.png" class="img" alt="Thiết bị trường học" loading="lazy" decoding="async" srcset="https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/truong-hoc-300x233.png 300w, https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/truong-hoc.png 368w" sizes="auto, (max-width: 300px) 100vw, 300px" />					</div>
 					<div class="label">Thiết bị trường học</div>
-			</a>
+			<span class="vmx-scg-ov" id="vmx-scg-d13" aria-hidden="true"><span class="vmx-scg-ov__desc">Bàn ghế học sinh, tủ kệ đồ chơi, thảm trải sàn, bảng viết và kệ sách cho lớp học mầm non.</span><span class="vmx-scg-ov__more">Xem thêm<i class="fa-light fa-arrow-right" aria-hidden="true"></i></span></span></a>
 			</div>
 		<div class="card-wrap">
-	<a		class="card card--purple"
+	<a aria-describedby="vmx-scg-d14"		class="card card--purple"
 							href="https://website-demo-02.thcmedia.vn/do-choi-ngoai-troi-mam-non/"
 			target="_self"
 						>
 		<div class="media">
 							<img width="300" height="233" src="https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/ngoai-troi-300x233.png" class="img" alt="Đồ chơi ngoài trời mầm non" loading="lazy" decoding="async" srcset="https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/ngoai-troi-300x233.png 300w, https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/ngoai-troi.png 368w" sizes="auto, (max-width: 300px) 100vw, 300px" />					</div>
 					<div class="label">Đồ chơi ngoài trời mầm non</div>
-			</a>
+			<span class="vmx-scg-ov" id="vmx-scg-d14" aria-hidden="true"><span class="vmx-scg-ov__desc">Xích đu, đu quay, thang leo, cầu trượt liên hoàn và cầu thăng bằng cho sân trường, sân chơi.</span><span class="vmx-scg-ov__more">Xem thêm<i class="fa-light fa-arrow-right" aria-hidden="true"></i></span></span></a>
 			</div>
 		<div class="card-wrap">
-	<a		class="card card--mint"
+	<a aria-describedby="vmx-scg-d15"		class="card card--mint"
 							href="https://website-demo-02.thcmedia.vn/do-choi-khu-vui-choi-trong-nha/"
 			target="_self"
 						>
 		<div class="media">
 							<img width="300" height="233" src="https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/trong-nha-300x233.png" class="img" alt="Đồ chơi khu vui chơi trong nhà" loading="lazy" decoding="async" srcset="https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/trong-nha-300x233.png 300w, https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/trong-nha.png 368w" sizes="auto, (max-width: 300px) 100vw, 300px" />					</div>
 					<div class="label">Đồ chơi khu vui chơi trong nhà</div>
-			</a>
+			<span class="vmx-scg-ov" id="vmx-scg-d15" aria-hidden="true"><span class="vmx-scg-ov__desc">Nhà banh, nhà liên hoàn, hang chui, cầu trượt và xe chòi chân cho khu vui chơi trong nhà.</span><span class="vmx-scg-ov__more">Xem thêm<i class="fa-light fa-arrow-right" aria-hidden="true"></i></span></span></a>
 			</div>
 								</div>
 						</li>
 											<li class="splide__slide">
 							<div class="page">
 									<div class="card-wrap">
-	<a		class="card card--peach"
+	<a aria-describedby="vmx-scg-d16"		class="card card--peach"
 							href="https://website-demo-02.thcmedia.vn/do-choi-mam-non-nhap-khau/"
 			target="_self"
 						>
 		<div class="media">
 							<img width="300" height="233" src="https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/nhap-khau-300x233.png" class="img" alt="Đồ chơi mầm non nhập khẩu" loading="lazy" decoding="async" srcset="https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/nhap-khau-300x233.png 300w, https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/nhap-khau.png 368w" sizes="auto, (max-width: 300px) 100vw, 300px" />					</div>
 					<div class="label">Đồ chơi mầm non nhập khẩu</div>
-			</a>
+			<span class="vmx-scg-ov" id="vmx-scg-d16" aria-hidden="true"><span class="vmx-scg-ov__desc">Bập bênh, cầu trượt, nhà banh, xích đu, thú nhún và xe đạp 3 bánh nhập khẩu cho bé.</span><span class="vmx-scg-ov__more">Xem thêm<i class="fa-light fa-arrow-right" aria-hidden="true"></i></span></span></a>
 			</div>
 		<div class="card-wrap">
-	<a		class="card card--lavender"
+	<a aria-describedby="vmx-scg-d17"		class="card card--lavender"
 							href="https://website-demo-02.thcmedia.vn/do-choi-thong-minh/"
 			target="_self"
 						>
 		<div class="media">
 							<img width="300" height="233" src="https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/thong-minh-300x233.png" class="img" alt="Đồ chơi thông minh" loading="lazy" decoding="async" srcset="https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/thong-minh-300x233.png 300w, https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/thong-minh.png 368w" sizes="auto, (max-width: 300px) 100vw, 300px" />					</div>
 					<div class="label">Đồ chơi thông minh</div>
-			</a>
+			<span class="vmx-scg-ov" id="vmx-scg-d17" aria-hidden="true"><span class="vmx-scg-ov__desc">Đồ chơi lắp ghép, STEM, robot giáo dục, bảng tương tác và bộ thí nghiệm khoa học cho bé.</span><span class="vmx-scg-ov__more">Xem thêm<i class="fa-light fa-arrow-right" aria-hidden="true"></i></span></span></a>
 			</div>
 		<div class="card-wrap">
-	<a		class="card card--cyan"
+	<a aria-describedby="vmx-scg-d18"		class="card card--cyan"
 							href="https://website-demo-02.thcmedia.vn/thiet-bi-the-chat-mam-non/"
 			target="_self"
 						>
 		<div class="media">
 							<img width="300" height="233" src="https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/the-chat-300x233.png" class="img" alt="Thiết bị thể chất mầm non" loading="lazy" decoding="async" srcset="https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/the-chat-300x233.png 300w, https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/the-chat.png 368w" sizes="auto, (max-width: 300px) 100vw, 300px" />					</div>
 					<div class="label">Thiết bị thể chất mầm non</div>
-			</a>
+			<span class="vmx-scg-ov" id="vmx-scg-d18" aria-hidden="true"><span class="vmx-scg-ov__desc">Bóng rổ, khung thành, cầu thăng bằng, bạt nhún và dụng cụ tập gym cho giờ thể chất của bé.</span><span class="vmx-scg-ov__more">Xem thêm<i class="fa-light fa-arrow-right" aria-hidden="true"></i></span></span></a>
 			</div>
 		<div class="card-wrap">
-	<a		class="card card--apricot"
+	<a aria-describedby="vmx-scg-d19"		class="card card--apricot"
 							href="https://website-demo-02.thcmedia.vn/thiet-bi-san-choi/"
 			target="_self"
 						>
 		<div class="media">
 							<img width="300" height="233" src="https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/san-choi-300x233.png" class="img" alt="Thiết bị sân chơi" loading="lazy" decoding="async" srcset="https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/san-choi-300x233.png 300w, https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/san-choi.png 368w" sizes="auto, (max-width: 300px) 100vw, 300px" />					</div>
 					<div class="label">Thiết bị sân chơi</div>
-			</a>
+			<span class="vmx-scg-ov" id="vmx-scg-d19" aria-hidden="true"><span class="vmx-scg-ov__desc">Xích đu, nhà banh, đu quay, thang leo, bập bênh, thú nhún và cầu trượt liên hoàn ngoài trời.</span><span class="vmx-scg-ov__more">Xem thêm<i class="fa-light fa-arrow-right" aria-hidden="true"></i></span></span></a>
 			</div>
 								</div>
 						</li>
 											<li class="splide__slide">
 							<div class="page">
 									<div class="card-wrap">
-	<a		class="card card--green"
+	<a aria-describedby="vmx-scg-d20"		class="card card--green"
 							href="https://website-demo-02.thcmedia.vn/thiet-bi-cong-vien/"
 			target="_self"
 						>
 		<div class="media">
 							<img width="300" height="233" src="https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/cong-vien-300x233.png" class="img" alt="Thiết bị công viên" loading="lazy" decoding="async" srcset="https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/cong-vien-300x233.png 300w, https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/cong-vien.png 368w" sizes="auto, (max-width: 300px) 100vw, 300px" />					</div>
 					<div class="label">Thiết bị công viên</div>
-			</a>
+			<span class="vmx-scg-ov" id="vmx-scg-d20" aria-hidden="true"><span class="vmx-scg-ov__desc">Dụng cụ thể dục ngoài trời cho công viên: đi bộ trên không, đạp xe tại chỗ, xoay eo, tập tay vai.</span><span class="vmx-scg-ov__more">Xem thêm<i class="fa-light fa-arrow-right" aria-hidden="true"></i></span></span></a>
 			</div>
 		<div class="card-wrap">
-	<a		class="card card--pink"
+	<a aria-describedby="vmx-scg-d21"		class="card card--pink"
 							href="https://website-demo-02.thcmedia.vn/thiet-bi-do-choi-ngoai-troi-tt32/"
 			target="_self"
 						>
 		<div class="media">
 							<img width="300" height="233" src="https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/thong-tu-32-300x233.png" class="img" alt="Thiết bị, đồ chơi ngoài trời theo Thông tư 32" loading="lazy" decoding="async" srcset="https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/thong-tu-32-300x233.png 300w, https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/thong-tu-32.png 368w" sizes="auto, (max-width: 300px) 100vw, 300px" />					</div>
 					<div class="label">Thiết bị, đồ chơi ngoài trời theo Thông tư 32</div>
-			</a>
+			<span class="vmx-scg-ov" id="vmx-scg-d21" aria-hidden="true"><span class="vmx-scg-ov__desc">Thiết bị, đồ chơi ngoài trời theo danh mục Thông tư 32/2012 của Bộ GD&amp;ĐT cho nhà trẻ và mẫu giáo.</span><span class="vmx-scg-ov__more">Xem thêm<i class="fa-light fa-arrow-right" aria-hidden="true"></i></span></span></a>
 			</div>
 		<div class="card-wrap">
-	<a		class="card card--sky"
+	<a aria-describedby="vmx-scg-d22"		class="card card--sky"
 							href="https://website-demo-02.thcmedia.vn/do-dung-do-choi-theo-thong-tu-02/"
 			target="_self"
 						>
 		<div class="media">
 							<img width="300" height="233" src="https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/thong-tu-02-300x233.png" class="img" alt="Đồ dùng - Đồ chơi theo Thông tư 02" loading="lazy" decoding="async" srcset="https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/thong-tu-02-300x233.png 300w, https://website-demo-02.thcmedia.vn/wp-content/uploads/2026/08/thong-tu-02.png 368w" sizes="auto, (max-width: 300px) 100vw, 300px" />					</div>
 					<div class="label">Đồ dùng - Đồ chơi theo Thông tư 02</div>
-			</a>
+			<span class="vmx-scg-ov" id="vmx-scg-d22" aria-hidden="true"><span class="vmx-scg-ov__desc">Đồ dùng, đồ chơi và thiết bị dạy học tối thiểu cho giáo dục mầm non theo danh mục Thông tư 02/2010.</span><span class="vmx-scg-ov__more">Xem thêm<i class="fa-light fa-arrow-right" aria-hidden="true"></i></span></span></a>
 			</div>
 								</div>
 						</li>
