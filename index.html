@@ -688,7 +688,8 @@ html.vmx-fx #about_journey .marker::after {
    Nên đổi mốc sang kiểu trục trái (giống khối Quy trình cùng trang): icon trái, chữ căn trái bên phải, thanh chạy qua tâm icon.
    ::before = rãnh mờ đủ dài · ::after = thanh đỏ, scaleY theo --vmx-rail-p (0 → 1) do hieu-ung-cuon.js đặt mỗi khung cuộn.
    Vị trí thanh (--vmx-rail-top / --vmx-rail-h) cũng do JS đo: từ tâm icon mốc đầu tới tâm icon mốc cuối.
-   768–991 (lưới 2 cột) giữ như live — user chỉ yêu cầu mobile. */
+   768–991 (lưới 2 cột) giữ như live — user chỉ yêu cầu mobile.
+   v9–v14 chữ mốc đứng yên; v15 chữ mốc 2, 3 co/giãn theo thanh (cuối khối này). */
 @media (max-width: 767.98px) {
   html.vmx-fx #about_journey .item { flex-direction: row; align-items: flex-start; gap: 16px; text-align: left; }
   html.vmx-fx #about_journey .marker { flex: 0 0 auto; }
@@ -726,6 +727,14 @@ html.vmx-fx #about_journey .marker::after {
   /* thanh chạy tới mốc cuối → mốc "Hiện tại" toả 2 vòng sóng (mỗi lần thanh chạy hết lại diễn lại) */
   html.vmx-fx #about_journey .timeline.vmx-rail-full .item:last-child .marker::after {
     animation: vmx-journey-ripple 1200ms var(--ease-out) 2;
+  }
+  /* v15 — CHỮ MỐC CO/GIÃN THEO THANH, y như Quy trình v12–v13 (user 22/10: "với Hành trình phát triển ở mobile cũng làm
+     tương tự"). Mốc 1 luôn hiện chữ; mốc 2, 3 chưa tới thì chữ (.copy) co hẳn về cao 0 → mỗi mốc chỉ còn icon 56px, trang
+     ngắn lại; thanh chạm icon thì chữ giãn ra (WAAPI fold() trong hieu-ung-cuon.js), cuộn lên rút qua thì co lại.
+     .vmx-rail-on chỉ có khi JS chạy VÀ đang ≤767 → JS lỗi hoặc lên tablet/desktop thì chữ hiện như live. */
+  html.vmx-fx #about_journey .timeline.vmx-rail-on .copy { overflow: clip; }
+  html.vmx-fx #about_journey .timeline.vmx-rail-on .item:not(:first-child):not(.vmx-reached) .copy {
+    height: 0; padding-top: 0; padding-bottom: 0; opacity: 0;
   }
 }
 
@@ -5661,7 +5670,7 @@ var e="script#wp-emoji-settings",t=document.querySelector(e);if(!(t instanceof H
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
 
   var rails = [
-    { tl: '#about_journey .timeline', dot: '.icon', mq: '(max-width: 767.98px)' },
+    { tl: '#about_journey .timeline', dot: '.icon', mq: '(max-width: 767.98px)', fold: '.copy' },   // v15: chữ mốc co/giãn
     { tl: '#about_process .timeline', dot: '.num', mq: 'all', fold: '.card' }
   ].map(function (r) {
     var tl = document.querySelector(r.tl);

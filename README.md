@@ -29,7 +29,7 @@ Trên điện thoại, hiệu ứng hover tự tắt. Máy bật "giảm chuyể
 |---|---|---|
 | Tầm nhìn & Sứ mệnh | Đứng yên như site | Icon nhún lên 4px |
 | Hành trình phát triển, máy tính và tablet (≥ 768px) | Đứng yên như site | Icon nhún lên 4px |
-| Hành trình phát triển, mobile (≤ 767px) | Mốc xếp dọc, icon nằm bên trái, chữ đứng yên. **Thanh đỏ dọc dài ra khi cuộn xuống, ngắn lại khi cuộn lên.** Icon chưa tới thì tắt (nền trắng, icon xám nhạt); thanh chạm tới thì sáng dần thành tròn đỏ như site, icon đang đứng có quầng mờ; thanh rút lên qua thì tắt lại. Thanh chạy hết thì mốc cuối toả 2 vòng sóng | – |
+| Hành trình phát triển, mobile (≤ 767px) | Mốc xếp dọc, icon nằm bên trái. **Thanh đỏ dọc dài ra khi cuộn xuống, ngắn lại khi cuộn lên.** Icon chưa tới thì tắt (nền trắng, icon xám nhạt); thanh chạm tới thì sáng dần thành tròn đỏ như site, icon đang đứng có quầng mờ; thanh rút lên qua thì tắt lại. Thanh chạy hết thì mốc cuối toả 2 vòng sóng. **Chữ mốc co/giãn theo thanh** (v15, giống Quy trình): mốc 2013 luôn hiện chữ; mốc 2015 và 2016 chưa tới thì chỉ còn icon, thanh chạm icon thì chữ giãn ra, cuộn lên thì co lại. Khối cao 314px khi co, 455px khi giãn; CLS đo khi lăn qua là 0,072 | – |
 | Giá trị cốt lõi | Đứng yên như site | **Cả thẻ nhún lên 4px** kèm bóng nhẹ, viền chuyển đỏ nhạt (bóng và viền lấy đúng hover thẻ Đối tác), icon nhún thêm 4px |
 
 - Tầm nhìn và Hành trình không nhấc cả thẻ khi rê chuột, vì các thẻ này không bấm được, nhấc lên kèm bóng dễ khiến khách tưởng là link. Riêng Giá trị cốt lõi nhấc cả thẻ theo yêu cầu.
