@@ -1,6 +1,6 @@
 # Demo hiệu ứng: trang Giới thiệu Thiết bị mầm non Việt Mỹ
 
-Bản chụp nguyên trang https://website-demo-02.thcmedia.vn/gioi-thieu/ (ngày 21/10/2026). **Không đổi nội dung hay thứ tự section nào.** Demo phủ thêm 6 hiệu ứng, thu gọn khoảng cách giữa các section, chỉnh cỡ chữ theo tab "Size chữ", làm gọn hero, thêm hover cho 3 khối Tầm nhìn & Sứ mệnh, Hành trình phát triển, Giá trị cốt lõi, thêm thanh liền với ô sáng dần theo cuộn cho Quy trình tư vấn và Hành trình (mobile), và hiện mô tả khi rê chuột lên thẻ Mua theo nhóm Thiết bị.
+Bản chụp nguyên trang https://website-demo-02.thcmedia.vn/gioi-thieu/ (ngày 21/10/2026). **Không đổi nội dung hay thứ tự section nào.** Demo phủ thêm 6 hiệu ứng, thu gọn khoảng cách giữa các section, chỉnh cỡ chữ theo tab "Size chữ", làm gọn hero, thêm hover cho 3 khối Tầm nhìn & Sứ mệnh, Hành trình phát triển, Giá trị cốt lõi, thêm thanh liền với ô sáng dần theo cuộn cho Quy trình tư vấn và Hành trình (mobile), và hiện mô tả khi rê chuột lên thẻ Mua theo nhóm Thiết bị. Riêng khối Mua theo nhóm Thiết bị, từ v18 tên nhóm, mô tả và thứ tự thẻ theo nội dung user gửi ngày 27/10.
 
 **Xem demo:** https://lanvi-commits.github.io/demo-gioi-thieu-thiet-bi-mam-non-viet-my/
 
@@ -83,7 +83,25 @@ Demo làm theo mẫu thẻ luật sư user gửi:
 - Chữ trắng trên lớp navy 62% đạt tương phản khoảng 4,95:1 ở trường hợp xấu nhất (phía sau là nền trắng), vẫn qua chuẩn AA 4,5:1. Đã thử hạ xuống 52% nhưng chữ khó đọc trên ảnh nhiều màu. Lớp phủ dùng `position: absolute` và chỉ đổi `opacity`, nên không làm trang xê dịch (không ảnh hưởng CLS).
 - Trình đọc màn hình: lớp phủ có `aria-hidden`, còn link trỏ `aria-describedby` vào nó. Tên link vẫn là tên nhóm, mô tả được đọc thành phần mô tả, không bị đọc 2 lần.
 
-**Nội dung mô tả là bản mẫu, cần khách duyệt.** Site chỉ có mô tả danh mục cho Đồ chơi vận động, nên câu của thẻ này lấy đúng từ mô tả đó. 10 nhóm còn lại chưa có mô tả, nên câu được ghép từ các danh mục con đang hiện trên trang danh mục của từng nhóm (đọc ngày 22/10), không thêm số liệu hay chứng nhận nào. Hai nhóm Thông tư 02 và Thông tư 32 viết theo đúng tên danh mục của thông tư.
+**Nội dung (v18, 27/10/2026):** tên nhóm, mô tả và thứ tự 11 thẻ theo danh sách nội dung user gửi, chép nguyên văn. So với site:
+
+| # | Tên nhóm demo | Tên trên site | Vị trí trên site |
+|---|---|---|---|
+| 1 | Đồ dùng, đồ chơi theo Thông tư 02 | Đồ dùng - Đồ chơi theo Thông tư 02 | 11 |
+| 2 | Đồ chơi Thông tư 32 | Thiết bị, đồ chơi ngoài trời theo Thông tư 32 | 10 |
+| 3 | Đồ chơi vận động mầm non | (giữ) | 1 |
+| 4 | Thiết bị trường học | (giữ) | 2 |
+| 5 | Đồ chơi mầm non ngoài trời | Đồ chơi ngoài trời mầm non | 3 |
+| 6 | Đồ chơi khu vui chơi trong nhà | (giữ) | 4 |
+| 7 | Đồ chơi mầm non nhập khẩu | (giữ) | 5 |
+| 8 | Đồ chơi thông minh | (giữ) | 6 |
+| 9 | Thiết bị thể chất mầm non | (giữ) | 7 |
+| 10 | Thiết bị sân chơi | (giữ) | 8 |
+| 11 | Thiết bị công viên | (giữ) | 9 |
+
+Mô tả mới dài hơn câu mẫu v14 (khoảng 130 ký tự) nên giới hạn số dòng được nới: 7 → 9 dòng ở màn ≥768px, 5 → 6 dòng ở ≤767px. Cỡ chữ giữ nguyên. Đã đo 11/11 thẻ hiện đủ chữ, chữ "Xem thêm" nằm trong thẻ ở 1440 / 1024 / 820 / 390 / 360px. Công tắc **Tắt** vẫn trả về đúng thứ tự và tên nhóm như site. Bản câu mẫu v14 (ghép từ danh mục con) vẫn còn trong `build.py.bak-v17`.
+
+**Cho DEV:** tên nhóm và mô tả nhập ở WooCommerce → Sản phẩm → Danh mục (trường Tên, Mô tả). Thứ tự là thứ tự nhóm trong cấu hình khối `shop_category_groups` của theme. Phần JS đổi thứ tự khi bật/tắt công tắc chỉ dùng cho demo, không chép.
 
 **Cho DEV:** CSS ở mục 14 trong khối `<style id="vmx-fx">`. JS cho cảm ứng ở khối `<script id="vmx-fx-nhom">` (khoảng 30 dòng, chép nguyên khối, bỏ điều kiện `html.vmx-fx`). JS nhận cảm ứng theo loại thao tác của lần chạm (`pointerType`), không theo khổ màn hình. Vì vậy laptop màn cảm ứng vẫn rê chuột như thường, chạm bằng tay mới đi theo luồng chạm 2 lần. Slider mobile bị `splide-autoplay.js` ép tự chạy, nên JS focus vào thẻ đang mở để Splide tạm dừng (tuỳ chọn `pauseOnFocus` mặc định bật). Trong theme, chèn vào cuối thẻ `<a class="card">` của component `shop_category_groups`:
 
